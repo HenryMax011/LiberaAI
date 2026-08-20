@@ -13,12 +13,12 @@ export function Wrap({ className = "", children, as: Tag = "div", ...props }) {
   );
 }
 
-export function Brand({ to = "/#topo", className = "" }) {
+export function Brand({ to = "/", className = "", onClick }) {
   const inner = (
     <img
       src="/img/logo-liberaai.png"
       alt="LiberaAI Engenharia"
-      className="h-16 w-auto select-none"
+      className="brand-mark select-none"
       draggable="false"
     />
   );
@@ -27,14 +27,14 @@ export function Brand({ to = "/#topo", className = "" }) {
 
   if (to.startsWith("/#") || to.startsWith("#")) {
     return (
-      <a className={cls} href={to.replace(/^\/#/, "#")} aria-label="LiberaAI início">
+      <a className={cls} href={to.replace(/^\/#/, "#")} aria-label="LiberaAI início" onClick={onClick}>
         {inner}
       </a>
     );
   }
 
   return (
-    <Link className={cls} to={to} aria-label="LiberaAI início">
+    <Link className={cls} to={to} aria-label="LiberaAI início" onClick={onClick}>
       {inner}
     </Link>
   );
@@ -48,7 +48,7 @@ export function WaIcon({ size = 16 }) {
   );
 }
 
-export function WaLink({ text, className = "", children, direct = false, onClick, ...props }) {
+export function WaLink({ text, className = "", children, direct = false, to = "/whatsapp/?source=LP_HOME", onClick, ...props }) {
   if (direct) {
     return (
       <a href={waUrl(text)} target="_blank" rel="noopener noreferrer" className={className} onClick={onClick} {...props}>
@@ -59,7 +59,7 @@ export function WaLink({ text, className = "", children, direct = false, onClick
 
   return (
     <Link
-      to="/falar"
+      to={to}
       className={className}
       onClick={(ev) => {
         try {
@@ -99,7 +99,9 @@ export function Eyebrow({ children, className = "" }) {
 export function PhotoStage({ src, tone = "wash", position = "center", className = "", eager = false }) {
   return (
     <div className={cn("photo-stage", `photo-stage-${tone}`, className)} aria-hidden="true">
-      <img src={src} alt="" decoding="async" loading={eager ? "eager" : "lazy"} style={{ objectPosition: position }} />
+      <div className="photo-stage-shift">
+        <img src={src} alt="" decoding="async" loading={eager ? "eager" : "lazy"} style={{ objectPosition: position }} />
+      </div>
       <div className="photo-veil" />
       <span className="photo-hud photo-hud-tl" />
       <span className="photo-hud photo-hud-tr" />
@@ -114,7 +116,7 @@ export function SectionHead({ eyebrow, title, lede }) {
     <div className="max-w-[36.25rem]">
       <Eyebrow className="reveal">{eyebrow}</Eyebrow>
       <h2 className="display reveal mt-3.5 text-[clamp(2.5rem,1.7rem+3.2vw,4.1rem)]">{title}</h2>
-      {lede ? <p className="reveal mt-4 max-w-[36.25rem] text-[17px] leading-[1.6] text-ink-2">{lede}</p> : null}
+      {lede ? <p className="reveal mt-4 max-w-[36.25rem] text-[17px] leading-[1.6] text-white">{lede}</p> : null}
     </div>
   );
 }

@@ -8,7 +8,7 @@ export function Footer() {
     <footer className="relative overflow-hidden bg-slate pt-[72px] text-on-slate-muted">
       <Wrap className="grid gap-10 md:grid-cols-[1.3fr_1fr_1fr]">
         <div>
-          <Brand to="#topo" light />
+          <Brand to="/" light />
           <p className="mt-4 max-w-[32ch]">Alvará, sanitário e bombeiros. Regularização completa na capital de São Paulo.</p>
           <WaLink text="Olá, quero falar com a LiberaAI." className="btn btn-on-dark mt-5">
             Falar com especialista →
@@ -17,11 +17,14 @@ export function Footer() {
         <div>
           <h3 className="mono mb-4 text-on-slate">Navegação</h3>
           <ul className="m-0 grid list-none gap-2.5 p-0">
+            <li><Link className="cursor-pointer text-on-slate-muted no-underline hover:text-accent-mid" to="/">Home</Link></li>
             <li><a className="cursor-pointer text-on-slate-muted no-underline hover:text-accent-mid" href="/#servicos">Serviços</a></li>
+            <li><Link className="cursor-pointer text-on-slate-muted no-underline hover:text-accent-mid" to="/alvara-de-funcionamento">Alvará de funcionamento</Link></li>
+            <li><Link className="cursor-pointer text-on-slate-muted no-underline hover:text-accent-mid" to="/vigilancia-sanitaria">Vigilância sanitária</Link></li>
             <li><a className="cursor-pointer text-on-slate-muted no-underline hover:text-accent-mid" href="/#solucoes">Como funciona</a></li>
             <li><a className="cursor-pointer text-on-slate-muted no-underline hover:text-accent-mid" href="/#quem-somos">Quem somos</a></li>
             <li><a className="cursor-pointer text-on-slate-muted no-underline hover:text-accent-mid" href="/#faq">Perguntas</a></li>
-            <li><Link className="cursor-pointer text-on-slate-muted no-underline hover:text-accent-mid" to="/falar">Contato</Link></li>
+            <li><Link className="cursor-pointer text-on-slate-muted no-underline hover:text-accent-mid" to="/whatsapp/?source=LP_HOME">Contato</Link></li>
             <li><Link className="cursor-pointer text-on-slate-muted no-underline hover:text-accent-mid" to="/privacidade">Política de privacidade</Link></li>
           </ul>
         </div>

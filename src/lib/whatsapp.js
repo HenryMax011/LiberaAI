@@ -2,6 +2,12 @@ export const WHATSAPP_NUMBER = "5511999999999";
 export const WA_INTENT_KEY = "libera-wa-intent";
 export const WA_MESSAGE_KEY = "libera-wa-message";
 
+export const WA_FORM = {
+  home: "/whatsapp/?source=LP_HOME",
+  alvara: "/whatsapp/?source=LP_ALVARA_FUNCIONAMENTO",
+  vigilancia: "/whatsapp/?source=LP_VIGILANCIA_SANITARIA",
+};
+
 export function waUrl(text) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
     text || "Olá, quero regularizar minha empresa com a LiberaAI."

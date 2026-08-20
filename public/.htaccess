@@ -1,0 +1,14 @@
+RewriteEngine On
+RewriteBase /
+
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+RewriteRule ^api/leads/?$ api/leads.php [L]
+RewriteRule ^api/health/?$ api/health.php [L]
+RewriteRule ^api/test-smtp/?$ api/test-smtp.php [L]
+
+RewriteRule ^index\.html$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]

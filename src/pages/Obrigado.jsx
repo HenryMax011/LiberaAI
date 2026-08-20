@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Ambient } from "../components/Ambient";
 import { Brand, WaIcon, WaLink, Wrap } from "../components/ui";
 import { readLeadMessage } from "../lib/whatsapp";
@@ -8,30 +8,31 @@ export function Obrigado() {
   const year = new Date().getFullYear();
   const message = readLeadMessage();
   const { pathname } = useLocation();
-  const fromWhatsApp = pathname.startsWith("/obrigado/whatsapp");
+  const navigate = useNavigate();
+  const fromWhatsApp = pathname.includes("/obrigado/whatsapp");
 
   useEffect(() => {
     document.title = "Muito obrigado · LiberaAI";
     window.scrollTo(0, 0);
-    if (fromWhatsApp && !pathname.endsWith("/")) {
-      window.history.replaceState(null, "", "/obrigado/whatsapp/");
+    if (pathname.startsWith("/home/obrigado")) {
+      navigate(pathname.replace(/^\/home/, "") || "/obrigado/formulario", { replace: true });
     }
     return () => {
       document.title = "LiberaAI · alvará e licenças em São Paulo";
     };
-  }, [fromWhatsApp, pathname]);
+  }, [fromWhatsApp, pathname, navigate]);
 
   return (
     <>
       <Ambient />
-      <header className="fixed top-3 right-0 left-0 z-50">
+      <header className="site-header">
         <nav className="site-nav">
           <Brand to="/" />
         </nav>
       </header>
 
       <div className="relative z-1 flex min-h-dvh flex-col">
-        <main className="flex flex-1 flex-col justify-center pt-32 pb-24">
+        <main className="flex flex-1 flex-col justify-center pt-[7.25rem] pb-24 lg:pt-[8.75rem]">
           <Wrap className="flex justify-center">
             <aside className="talk-card w-full max-w-[32rem]" aria-label="Confirmação de envio">
               <p className="mono text-accent-strong">Enviado</p>

@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { WaIcon, WaLink } from "./ui";
 
-export function ConvertBar() {
+export function ConvertBar({
+  waPath = "/whatsapp/?source=LP_HOME",
+  waText = "Olá, quero um diagnóstico da LiberaAI para regularizar minha empresa.",
+}) {
   const [on, setOn] = useState(false);
 
   useEffect(() => {
@@ -14,10 +17,10 @@ export function ConvertBar() {
   return (
     <div className={`convert-bar ${on ? "is-on" : ""}`} role="region" aria-label="Contato rápido">
       <p>
-        <strong>Diagnóstico sem custo</strong>
-        <span>Resposta no mesmo dia</span>
+        <strong>Regularize sua empresa</strong>
+        <span>Resposta imediata</span>
       </p>
-      <WaLink text="Olá, quero um diagnóstico da LiberaAI para regularizar minha empresa." className="btn btn-primary">
+      <WaLink to={waPath} text={waText} className="btn btn-wa">
         <WaIcon />
         Falar no WhatsApp
       </WaLink>

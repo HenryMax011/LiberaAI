@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useMotion } from "../hooks/useMotion";
-import { composeLeadMessage, saveLeadMessage } from "../lib/whatsapp";
-import { digitsOnly, maskPhone } from "../lib/phone";
 import { Ambient } from "../components/Ambient";
 import { ConvertBar } from "../components/ConvertBar";
 import { Nav } from "../components/Nav";
@@ -25,9 +23,51 @@ const CLIENTS = [
   ["Shell Select", "/img/clients/shell-select.png"],
 ];
 
+const LANDINGS = {
+  home: {
+    title: "LiberaAI · alvará e licenças em São Paulo",
+    eyebrow: "Licenciamento / São Paulo / diagnóstico",
+    headline: (
+      <>
+        Regularize sua empresa com quem <em className="beat">entende</em> do assunto.
+      </>
+    ),
+    lede: "Tenha mais segurança para operar, crescer e aproveitar novas oportunidades.",
+    waText: "Olá, quero um orçamento da LiberaAI.",
+    waPath: "/whatsapp/?source=LP_HOME",
+    formPath: "/formulario",
+  },
+  alvara: {
+    title: "Alvará de funcionamento · LiberaAI",
+    eyebrow: "Especialistas em alvará de funcionamento",
+    headline: (
+      <>
+        Regularize seu Alvará de Funcionamento <em className="beat">agora</em>.
+      </>
+    ),
+    lede: "Cuidamos da análise, documentação e acompanhamento para sua empresa funcionar dentro da lei.",
+    waText: "Olá, quero regularizar o alvará de funcionamento com a LiberaAI.",
+    waPath: "/whatsapp/?source=LP_ALVARA_FUNCIONAMENTO",
+    formPath: "/formulario/alvara-de-funcionamento",
+  },
+  vigilancia: {
+    title: "Vigilância sanitária · LiberaAI",
+    eyebrow: "Especialistas em licenciamento sanitário",
+    headline: (
+      <>
+        Licenciamento sanitário com <em className="beat">agilidade</em>.
+      </>
+    ),
+    lede: "Regularizamos seu estabelecimento para operar com tranquilidade e ficar dentro da lei.",
+    waText: "Olá, quero o licenciamento sanitário com a LiberaAI.",
+    waPath: "/whatsapp/?source=LP_VIGILANCIA_SANITARIA",
+    formPath: "/formulario/vigilancia-sanitaria",
+  },
+};
+
 const SERVICES = [
-  ["01", "Alvará de funcionamento", "Obtenção e regularização do alvará em São Paulo, lendo CNAE e imóvel com precisão.", ["MEI, ME e EPP", "Regularização", "Adequação e pré-vistoria"]],
-  ["02", "Licenciamento sanitário", "Regularização sanitária com acompanhamento técnico na capital.", ["ANVISA", "Secretaria de Saúde", "PGRSS"]],
+  ["01", "Alvará de funcionamento", "Obtenção e regularização do alvará em São Paulo, lendo CNAE e imóvel com precisão.", ["MEI, ME e EPP", "Regularização", "Adequação e pré-vistoria"], "/alvara-de-funcionamento"],
+  ["02", "Licenciamento sanitário", "Regularização sanitária com acompanhamento técnico na capital.", ["ANVISA", "Secretaria de Saúde", "PGRSS"], "/vigilancia-sanitaria"],
   ["03", "AVCB / CLCB", "AVCB, CLCB e APPCI junto ao Corpo de Bombeiros, com o trâmite organizado.", ["AVCB", "CLCB", "APPCI"]],
   ["04", "CETESB e licenças ambientais", "Licenças de instalação e operação para indústrias em São Paulo.", ["Licença de instalação", "Licença de operação", "SVMA"]],
   ["05", "POP, boas práticas e DCFF", "Documentos para conformidade sanitária do estabelecimento.", ["POP", "Manual de boas práticas", "DCFF"]],
@@ -36,30 +76,9 @@ const SERVICES = [
 
 const STEPS = [
   ["01", "Você envia os dados", "Formulário curto com o que precisa regularizar."],
-  ["02", "Lemos a papelada", "Pendências à vista e o caminho mais curto para o seu CNAE."],
-  ["03", "Cuidamos do protocolo", "Prefeitura, vigilância e bombeiros — nós acompanhamos."],
+  ["02", "Consultas públicas", "Levantamos as exigências nos órgãos e o que falta no seu CNAE."],
+  ["03", "Entrega de protocolos", "Protocolamos na prefeitura, vigilância e bombeiros e acompanhamos."],
   ["04", "Licença na mão", "Você opera. A gente entrega o que o órgão exigiu."],
-];
-
-const AREAS = [
-  ["01", "Alvará de funcionamento", "O documento-base para o ponto operar. Lemos CNAE e imóvel e definimos a via mais curta."],
-  ["02", "Licenciamento sanitário", "ANVISA, secretaria e PGRSS no mesmo acompanhamento."],
-  ["03", "AVCB / CLCB", "Bombeiros com o trâmite organizado, do projeto ao carimbo."],
-];
-
-const AREA_ICONS = [
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
-    <path d="M14 3v5h5" />
-    <path d="M9 13h6M9 16.5h4" />
-  </svg>,
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 3l7 3v5c0 4.4-3 8-7 10-4-2-7-5.6-7-10V6z" />
-    <path d="M12 8.5v6M9 11.5h6" />
-  </svg>,
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 3c1 3-2 4-2 7a2 2 0 1 0 4 0c0-1-.5-1.8-.5-1.8 1.9 1 3 3 3 5.3a4.5 4.5 0 1 1-9 0C9.5 9.7 12 8 12 3z" />
-  </svg>,
 ];
 
 const TYPES = [
@@ -85,15 +104,6 @@ const TYPE_ICONS = [
   </svg>,
 ];
 
-const DIFFS = [
-  ["01", "Quem já viu o seu tipo de ponto", "Técnicos que leem CNAE, imóvel e órgão — sem recomeçar do zero. O diagnóstico já nasce com o caminho certo."],
-  ["02", "Personalizado, sem script", "Cada caso tem rota própria. Você fala com quem protocola, não com um robô."],
-  ["03", "Projeto e papel no prazo", "Documentação alinhada antes de entrar no órgão — menos devolução, mais avanço."],
-  ["04", "Conformidade de ponta a ponta", "Prefeitura, vigilância e bombeiros no mesmo mapa — nada fica solto."],
-  ["05", "Do protocolo à vistoria", "Acompanhamos exigência, prazo e resposta. Você não precisa caçar status."],
-  ["06", "Preço combinado, prazo cumprido", "Condição clara no início. Sem taxa escondida no meio do processo."],
-];
-
 const FAQS = [
   ["01", "Quanto tempo leva para obter as licenças?", "O prazo muda com o tipo de licença e o órgão. Em casos elegíveis, o alvará pode sair em até 24 horas. Nos demais, seguimos o calendário da prefeitura, da vigilância ou dos bombeiros, com acompanhamento nosso em cada etapa."],
   ["02", "Quais documentos são necessários?", "Em geral: contrato social ou MEI, comprovante do imóvel (IPTU ou locação), planta ou memorial quando exigido, e documentos dos responsáveis. O diagnóstico inicial lista exatamente o que o seu caso pede."],
@@ -103,101 +113,72 @@ const FAQS = [
   ["06", "Como começa o atendimento?", "Você deixa nome e WhatsApp. No mesmo dia um especialista lê o caso e aponta o que falta para operar dentro da lei."],
 ];
 
-function Hero() {
-  const navigate = useNavigate();
-  const [phone, setPhone] = useState("");
-
-  const onSubmit = (ev) => {
-    ev.preventDefault();
-    const data = new FormData(ev.currentTarget);
-    const name = String(data.get("nome") || "").trim();
-    const digits = digitsOnly(phone);
-    if (!name || digits.length < 10) return;
-    saveLeadMessage(
-      composeLeadMessage(name, phone, "quero um diagnóstico da LiberaAI para regularizar minha empresa.")
-    );
-    navigate("/obrigado/formulario");
-  };
-
+function Hero({ landing }) {
+  const copy = LANDINGS[landing] || LANDINGS.home;
   return (
-    <section className="relative overflow-hidden pt-32 pb-[clamp(56px,7vw,88px)]">
+    <section className="relative overflow-hidden pt-[7.25rem] pb-[clamp(40px,7vw,88px)] lg:pt-[8.75rem]">
       <Wrap className="grid items-center gap-10 lg:grid-cols-[1.08fr_0.92fr] lg:gap-14">
         <div className="hero-copy">
-          <Eyebrow className="hero-in reveal text-accent-strong">Licenciamento / São Paulo / diagnóstico</Eyebrow>
-          <h1 className="display hero-in reveal mt-[18px] text-[clamp(2.75rem,1.8rem+4vw,4.6rem)]">
-            Seu negócio legalizado. Seu crescimento sem <em className="beat">limites</em>.
+          <Eyebrow className="hero-in reveal text-accent-strong">{copy.eyebrow}</Eyebrow>
+          <h1 className="display hero-in reveal mt-[18px] text-[clamp(2.05rem,7.2vw,4.6rem)]">
+            {copy.headline}
           </h1>
           <p className="lede hero-in reveal mt-[22px] max-w-[36.25rem] text-[17.5px] font-medium leading-[1.65]">
-            Regularize sua empresa com quem entende do assunto e tenha mais segurança para operar, crescer e aproveitar novas oportunidades.
+            {copy.lede}
           </p>
           <div className="hero-in reveal mt-8 flex flex-wrap gap-4">
-            <WaLink text="Olá, quero um orçamento da LiberaAI." className="btn btn-primary">
+            <WaLink to={copy.waPath} text={copy.waText} className="btn btn-wa">
               <WaIcon />
               Falar no WhatsApp
             </WaLink>
+            <Link to={copy.formPath} className="btn btn-ghost btn-quote">
+              Faça seu orçamento aqui
+            </Link>
           </div>
         </div>
 
-        <aside id="diagnostico" className="device" aria-label="Diagnóstico e contato">
-          <form className="relative z-1 grid gap-3.5" onSubmit={onSubmit}>
-            <div className="device-field">
-              <label htmlFor="nome">Nome</label>
-              <input id="nome" name="nome" type="text" required autoComplete="name" placeholder="Seu nome" />
-            </div>
-            <div className="device-field">
-              <label htmlFor="whatsapp">WhatsApp</label>
-              <div className="device-phone">
-                <span className="device-phone-cc" aria-hidden="true">+55</span>
-                <input
-                  id="whatsapp"
-                  name="whatsapp"
-                  type="tel"
-                  required
-                  autoComplete="tel-national"
-                  inputMode="numeric"
-                  placeholder="(11) 90000-0000"
-                  value={phone}
-                  onChange={(ev) => setPhone(maskPhone(ev.target.value))}
-                  maxLength={15}
-                  minLength={14}
-                />
-              </div>
-            </div>
-            <button type="submit" className="btn btn-primary mt-1 w-full">
-              Enviar
-            </button>
-            <p className="m-0 text-center text-xs leading-relaxed text-muted">
-              Ao enviar, você concorda com a <Link to="/privacidade" className="text-accent">política de privacidade</Link>.
-            </p>
-          </form>
+        <aside className="device hero-media" aria-label="Vídeo institucional">
+          <img src="/img/ai-17.jpg" alt="" className="hero-media-fallback" />
+          <video
+            className="hero-media-video"
+            autoPlay
+            muted
+            loop
+            playsInline
+            poster="/img/ai-17.jpg"
+          >
+            <source src="/video/hero.mp4" type="video/mp4" />
+          </video>
         </aside>
       </Wrap>
     </section>
   );
 }
 
-export function Home() {
+export function Home({ landing = "home" }) {
   const [faqOpen, setFaqOpen] = useState(null);
+  const copy = LANDINGS[landing] || LANDINGS.home;
   useMotion();
 
   useEffect(() => {
+    document.title = copy.title;
     const { hash } = window.location;
     if (!hash) return undefined;
     const id = window.setTimeout(() => {
       document.querySelector(hash)?.scrollIntoView({ behavior: "smooth" });
     }, 80);
     return () => window.clearTimeout(id);
-  }, []);
+  }, [copy.title]);
 
   return (
     <>
       <Ambient />
       <Nav />
       <main id="topo" className="relative z-1">
-        <Hero />
+        <Hero landing={landing} />
 
         <div className="fx-proof relative z-5 -mt-5">
-          <Wrap className="grid gap-3 sm:grid-cols-4">
+          <Wrap className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {[
               [
                 "Atendimento",
@@ -258,15 +239,51 @@ export function Home() {
           </Wrap>
         </div>
 
-        <div className="band">
-          <div className="band-track">
+        <div className="relative z-5 mt-10">
+          <p className="mono mb-4 px-6 text-center text-accent-mid">Empresas que confiam na LiberaAI</p>
+          <div className="band">
+            <div className="band-track">
             {[...CLIENTS, ...CLIENTS].map(([name, src], i) => (
               <span key={`${name}-${i}`} className="band-logo">
                 <img src={src} alt={name} />
               </span>
             ))}
+            </div>
           </div>
         </div>
+
+        <section id="servicos" className="fx-services relative overflow-hidden py-[clamp(64px,8vw,104px)]">
+          <Wrap>
+            <SectionHead
+              eyebrow="Serviços"
+              title={<>O que colocamos em <em className="beat">funcionamento</em></>}
+              lede="Regularização, adequação e pré-vistoria com orientação para o seu ramo de atividade."
+            />
+            <div className="mt-8 grid gap-2.5 md:grid-cols-2 lg:grid-cols-3">
+              {SERVICES.map(([n, title, text, items, href]) => (
+                <Box key={n} className="reveal box-compact flex flex-col">
+                  <BoxNum>{n}</BoxNum>
+                  <h3 className="display m-0 text-[1.02rem] leading-snug">{title}</h3>
+                  <p className="mt-1.5 text-[12.5px] leading-snug text-muted">{text}</p>
+                  <ul className="mt-2.5 grid list-none gap-1 border-t border-accent/14 pt-2">
+                    {items.map((item) => (
+                      <li key={item} className="text-[11.5px] text-accent before:mr-1.5 before:inline-block before:size-[4px] before:translate-y-[-1px] before:rounded-full before:bg-accent-mid before:content-['']">{item}</li>
+                    ))}
+                  </ul>
+                  {href ? (
+                    <Link to={href} className="mt-auto pt-2.5 text-[12px] font-semibold text-accent no-underline">
+                      Ver esta página →
+                    </Link>
+                  ) : (
+                    <WaLink text={`Olá, quero o serviço de ${title} com a LiberaAI.`} className="mt-auto pt-2.5 text-[12px] font-semibold text-accent no-underline">
+                      Pedir este serviço →
+                    </WaLink>
+                  )}
+                </Box>
+              ))}
+            </div>
+          </Wrap>
+        </section>
 
         <section id="solucoes" className="fx-steps relative overflow-hidden py-[clamp(64px,8vw,104px)]">
           <Wrap>
@@ -289,34 +306,7 @@ export function Home() {
                 </Box>
               ))}
             </div>
-            <a href="#diagnostico" className="btn btn-primary reveal mt-8">Pedir diagnóstico grátis</a>
-          </Wrap>
-        </section>
-
-        <section id="servicos" className="fx-services relative overflow-hidden py-[clamp(64px,8vw,104px)]">
-          <Wrap>
-            <SectionHead
-              eyebrow="Serviços"
-              title={<>O que colocamos em <em className="beat">funcionamento</em></>}
-              lede="Regularização, adequação e pré-vistoria com orientação para o seu ramo de atividade."
-            />
-            <div className="mt-8 grid gap-2.5 md:grid-cols-2 lg:grid-cols-3">
-              {SERVICES.map(([n, title, text, items]) => (
-                <Box key={n} className="reveal box-compact flex flex-col">
-                  <BoxNum>{n}</BoxNum>
-                  <h3 className="display m-0 text-[1.02rem] leading-snug">{title}</h3>
-                  <p className="mt-1.5 text-[12.5px] leading-snug text-muted">{text}</p>
-                  <ul className="mt-2.5 grid list-none gap-1 border-t border-accent/14 pt-2">
-                    {items.map((item) => (
-                      <li key={item} className="text-[11.5px] text-accent before:mr-1.5 before:inline-block before:size-[4px] before:translate-y-[-1px] before:rounded-full before:bg-accent-mid before:content-['']">{item}</li>
-                    ))}
-                  </ul>
-                  <WaLink text={`Olá, quero o serviço de ${title} com a LiberaAI.`} className="mt-auto pt-2.5 text-[12px] font-semibold text-accent no-underline">
-                    Pedir este serviço →
-                  </WaLink>
-                </Box>
-              ))}
-            </div>
+            <Link to="/formulario" className="btn btn-primary reveal mt-8">Pedir diagnóstico grátis</Link>
           </Wrap>
         </section>
 
@@ -338,29 +328,6 @@ export function Home() {
                 <WaLink text="Olá, recebi fiscalização e preciso de atendimento urgente da LiberaAI." className="btn btn-primary">Falar agora →</WaLink>
               </div>
             </Box>
-          </Wrap>
-        </section>
-
-        <section className="fx-areas relative overflow-hidden py-[clamp(64px,8vw,104px)]">
-          <Wrap>
-            <SectionHead
-              eyebrow="Áreas"
-              title={<>Cada etapa do licenciamento, no mesmo <em className="beat">lugar</em></>}
-              lede="Adequamos o estabelecimento às normas de São Paulo: sanitário, bombeiros e alvará de funcionamento."
-            />
-            <div className="mt-10 grid gap-3 md:grid-cols-3">
-              {AREAS.map(([n, title, text], i) => (
-                <Box as="a" key={n} href="#servicos" className="reveal flex min-h-[220px] cursor-pointer flex-col text-inherit no-underline">
-                  <div className="flex items-center justify-between">
-                    <span className="area-icon" aria-hidden="true">{AREA_ICONS[i]}</span>
-                    <BoxNum sm>{n}</BoxNum>
-                  </div>
-                  <h3 className="display mt-5 m-0 text-[1.15rem]">{title}</h3>
-                  <p className="mt-2 text-[13.5px] leading-normal text-muted">{text}</p>
-                  <span className="mt-auto pt-[18px] text-[13px] font-semibold text-accent">Saiba mais →</span>
-                </Box>
-              ))}
-            </div>
           </Wrap>
         </section>
 
@@ -432,11 +399,10 @@ export function Home() {
             <div>
               <Eyebrow className="reveal">Quem somos</Eyebrow>
               <h2 className="display reveal mt-3.5 text-[clamp(2.5rem,1.7rem+3.2vw,4.1rem)]">
-                Foque no negócio. Nós cuidamos da <em className="beat">papelada</em>.
+                Regularização empresarial mais simples, ágil e <em className="beat">inteligente</em>
               </h2>
-              <p className="reveal mt-[18px] max-w-[36.25rem] text-[17px] leading-[1.6] text-ink-2">A LiberaAI junta gente de licenciamento com um fluxo de diagnóstico claro. Atendemos qualquer ramo na capital de São Paulo.</p>
-              <p className="reveal mt-[18px] max-w-[36.25rem] text-[17px] leading-[1.6] text-ink-2">A missão é simples: o empresário opera. Licença e alvará ficam conosco.</p>
-              <p className="mono reveal mt-7 text-accent">São Paulo / diagnóstico / acompanhamento</p>
+              <p className="reveal mt-[18px] max-w-[36.25rem] text-[17px] leading-[1.6] text-white">A LiberaAI nasceu para transformar a forma como empresas lidam com processos de regularização e burocracia.</p>
+              <p className="reveal mt-[18px] max-w-[36.25rem] text-[17px] leading-[1.6] text-white">Atuamos na regularização empresarial, oferecendo soluções como alvará de funcionamento e outros processos necessários para manter empresas em conformidade. Unimos conhecimento técnico, atendimento próximo e o poder da inteligência artificial para tornar cada etapa mais organizada, rápida e eficiente.</p>
             </div>
             <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-1">
               <Box className="reveal flex flex-col">
@@ -478,30 +444,11 @@ export function Home() {
           </Wrap>
         </section>
 
-        <section id="diferenciais" className="fx-diffs relative overflow-hidden py-[clamp(64px,8vw,104px)]">
-          <Wrap>
-            <SectionHead
-              eyebrow="Diferenciais"
-              title={<>Do primeiro protocolo ao <em className="beat">carimbo</em></>}
-              lede="Acompanhamento técnico até a licença sair — sem ruído, sem fila invisível."
-            />
-            <div className="mt-10 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-              {DIFFS.map(([n, title, text]) => (
-                <Box key={n} className="reveal flex flex-col">
-                  <BoxNum>{n}</BoxNum>
-                  <h3 className="display m-0 text-[1.15rem]">{title}</h3>
-                  <p className="mt-2 text-[13.5px] leading-normal text-muted">{text}</p>
-                </Box>
-              ))}
-            </div>
-          </Wrap>
-        </section>
-
         <section id="contato" className="fx-cta relative py-[clamp(64px,8vw,104px)]">
           <Wrap>
-            <div className="reveal relative isolate overflow-hidden rounded-[20px] border border-accent-mid/18 px-[clamp(36px,5vw,56px)] py-[clamp(36px,5vw,56px)] text-center text-on-slate shadow-canvas">
+            <div className="cta-depth relative isolate overflow-hidden rounded-[20px] border border-accent-mid/18 px-[clamp(20px,5vw,56px)] py-[clamp(28px,5vw,56px)] text-center text-on-slate shadow-canvas">
               <PhotoStage src="/img/ai-17.jpg" tone="dark" />
-              <div className="relative z-1">
+              <div className="reveal relative z-1">
                 <Eyebrow className="justify-center text-[#99f6e4] before:bg-[#99f6e4]/70">
                   <span className="live inline-block" /> Especialistas online
                 </Eyebrow>
@@ -525,7 +472,7 @@ export function Home() {
           <Wrap className="grid items-start gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
             <div>
               <SectionHead eyebrow="Perguntas" title="O que costumam perguntar" lede="Prazos, documentos e abrangência em São Paulo." />
-              <p className="reveal mt-8 max-w-[32ch] text-[16px] leading-[1.6] text-ink-2">Dúvida específica do seu caso?</p>
+              <p className="reveal mt-8 max-w-[32ch] text-[16px] leading-[1.6] text-white">Dúvida específica do seu caso?</p>
               <WaLink text="Olá, tenho uma dúvida específica sobre o licenciamento da minha empresa." className="btn btn-primary mt-4">
                 <WaIcon />
                 Falar com um especialista
@@ -560,7 +507,7 @@ export function Home() {
       </main>
       <Footer />
       <WhatsAppFab />
-      <ConvertBar />
+      <ConvertBar waPath={copy.waPath} waText={copy.waText} />
     </>
   );
 }
