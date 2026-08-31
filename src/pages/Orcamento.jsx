@@ -1,30 +1,25 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Ambient } from "../components/Ambient";
-import { Brand, Eyebrow, MarkOk, WaIcon, WaLink, Wrap } from "../components/ui";
+import { Brand, Eyebrow, Wrap } from "../components/ui";
 import { digitsOnly, maskPhone } from "../lib/phone";
 import { composeLeadMessage, saveLeadMessage } from "../lib/whatsapp";
 import { sendLead } from "../lib/leads";
 import { goToThanks, trackGenerateLead } from "../lib/tracking";
-
-const NOTES = [
-  "Leitura inicial sem custo",
-  "Resposta imediata",
-  "São Paulo - SP",
-];
 
 const KINDS = {
   default: {
     source: "LP_FORMULARIO",
     services: ["Orçamento"],
     titleDoc: "Faça seu orçamento · LiberaAI",
-    eyebrow: "Orçamento / diagnóstico / São Paulo",
+    eyebrow: "Orçamento · diagnóstico · São Paulo",
     heading: (
       <>
         Peça o <em className="beat">orçamento</em> do seu caso.
       </>
     ),
     intent: "quero um orçamento da LiberaAI para regularizar minha empresa.",
+    waService: "minha empresa",
     waPath: "/whatsapp/?source=LP_HOME",
     waText: "Olá, quero um orçamento da LiberaAI.",
     thanksPath: "/obrigado/formulario",
@@ -33,13 +28,14 @@ const KINDS = {
     source: "LP_ALVARA_FUNCIONAMENTO",
     services: ["Alvará de funcionamento"],
     titleDoc: "Orçamento · alvará de funcionamento · LiberaAI",
-    eyebrow: "Orçamento / alvará de funcionamento",
+    eyebrow: "Orçamento · alvará de funcionamento",
     heading: (
       <>
         Orçamento do <em className="beat">alvará</em> de funcionamento.
       </>
     ),
     intent: "quero regularizar o alvará de funcionamento com a LiberaAI.",
+    waService: "o alvará de funcionamento",
     waPath: "/whatsapp/?source=LP_ALVARA_FUNCIONAMENTO",
     waText: "Olá, quero regularizar o alvará de funcionamento com a LiberaAI.",
     thanksPath: "/alvara-de-funcionamento/obrigado/formulario",
@@ -48,13 +44,14 @@ const KINDS = {
     source: "LP_VIGILANCIA_SANITARIA",
     services: ["Vigilância sanitária"],
     titleDoc: "Orçamento · vigilância sanitária · LiberaAI",
-    eyebrow: "Orçamento / vigilância sanitária",
+    eyebrow: "Orçamento · vigilância sanitária",
     heading: (
       <>
         Orçamento do licenciamento <em className="beat">sanitário</em>.
       </>
     ),
     intent: "quero o licenciamento sanitário com a LiberaAI.",
+    waService: "a vigilância sanitária",
     waPath: "/whatsapp/?source=LP_VIGILANCIA_SANITARIA",
     waText: "Olá, quero o licenciamento sanitário com a LiberaAI.",
     thanksPath: "/vigilancia-sanitaria/obrigado/formulario",
@@ -91,7 +88,7 @@ export function Orcamento({ kind = "default" }) {
         source: copy.source,
         services: copy.services,
       });
-      saveLeadMessage(composeLeadMessage(name, phone, copy.intent));
+      saveLeadMessage(composeLeadMessage(name, copy.waService));
       trackGenerateLead({ source: copy.source, channel: "formulario" });
       goToThanks(copy.thanksPath);
     } catch (err) {
@@ -120,18 +117,6 @@ export function Orcamento({ kind = "default" }) {
               <p className="mt-[22px] max-w-[36.25rem] text-[17.5px] font-medium leading-[1.65] text-ink-2">
                 Nome e WhatsApp. A leitura inicial não tem custo. Você decide se segue.
               </p>
-              <ul className="mt-8 m-0 grid list-none gap-3 p-0">
-                {NOTES.map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-[15px] text-ink">
-                    <MarkOk />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <WaLink to={copy.waPath} text={copy.waText} className="btn btn-wa mt-8">
-                <WaIcon />
-                Falar no WhatsApp
-              </WaLink>
             </div>
 
             <aside className="talk-card" aria-label="Formulário de orçamento">

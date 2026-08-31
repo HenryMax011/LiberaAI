@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
@@ -6,6 +6,61 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
 const root = dirname(fileURLToPath(import.meta.url));
+
+function loadPublicEnv() {
+  const file = join(root, "public", ".env");
+  if (!existsSync(file)) return;
+  for (const line of readFileSync(file, "utf8").split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#") || !trimmed.includes("=")) continue;
+    const eq = trimmed.indexOf("=");
+    const key = trimmed.slice(0, eq).trim();
+    let value = trimmed.slice(eq + 1).trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+    if (key && process.env[key] === undefined) process.env[key] = value;
+  }
+}
+
+loadPublicEnv();
+
+function leadPagePath(pageUrl) {
+  try {
+    return new URL(String(pageUrl || "")).pathname || String(pageUrl || "");
+  } catch {
+    return String(pageUrl || "");
+  }
+}
+
+function forwardLeadToApi(payload) {
+  const url = process.env.LEADS_API_URL;
+  const token = process.env.LEADS_API_TOKEN;
+  if (!url || !token) return;
+  const services = Array.isArray(payload.services) ? payload.services.filter(Boolean) : [];
+  fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      nome: String(payload.name || ""),
+      email: String(payload.email || ""),
+      telefone: String(payload.phone || "").replace(/\D/g, ""),
+      mensagem: services.join(", "),
+      origem: "site-institucional",
+      empresa: "LIBERA_AI",
+      pagina: String(payload.pageUrl || leadPagePath(payload.pageUrl)),
+      website: "",
+    }),
+  }).catch(() => {
+    /* ouvinte adicional — não bloqueia o envio atual */
+  });
+}
 
 function readBody(req) {
   return new Promise((resolve, reject) => {
@@ -54,6 +109,7 @@ function leadsDevPlugin() {
             JSON.stringify({ lead: payload, meta: { receivedAt: new Date().toISOString(), env: "vite-dev" } }, null, 2)
           );
           json(res, 200, { success: true, message: "Lead recebido com sucesso." });
+          forwardLeadToApi(payload);
         } catch {
           json(res, 400, { success: false, message: "Não foi possível enviar sua solicitação." });
         }
@@ -62,6 +118,19 @@ function leadsDevPlugin() {
   };
 }
 
+function copyEnvPlugin() {
+  return {
+    name: "copy-env",
+    closeBundle() {
+      const from = join(root, "public", ".env");
+      const to = join(root, "dist", ".env");
+      if (!existsSync(from)) return;
+      mkdirSync(join(root, "dist"), { recursive: true });
+      copyFileSync(from, to);
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react(), tailwindcss(), leadsDevPlugin()],
+  plugins: [react(), tailwindcss(), leadsDevPlugin(), copyEnvPlugin()],
 });

@@ -37,5 +37,22 @@ export async function sendLead({ name, phone, source, services = [] }) {
   if (!response.ok || !data.success) {
     throw new Error(data.message || "Não foi possível enviar sua solicitação.");
   }
+
+  try {
+    window.NexoraLead?.send?.({
+      nome: name,
+      email: "",
+      telefone: `55${digits}`,
+      mensagem: services.filter(Boolean).join(", "),
+      origem: "site-institucional",
+      empresa: "LIBERA_AI",
+      pagina: window.location.pathname || "/",
+      source,
+      services: services.filter(Boolean).join(", "),
+    });
+  } catch {
+    /* ouvinte adicional — não interfere no envio atual */
+  }
+
   return data;
 }

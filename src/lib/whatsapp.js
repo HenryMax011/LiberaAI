@@ -1,4 +1,4 @@
-export const WHATSAPP_NUMBER = "5511999999999";
+export const WHATSAPP_NUMBER = "5511933853226";
 export const WA_INTENT_KEY = "libera-wa-intent";
 export const WA_MESSAGE_KEY = "libera-wa-message";
 
@@ -9,9 +9,8 @@ export const WA_FORM = {
 };
 
 export function waUrl(text) {
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-    text || "Olá, quero regularizar minha empresa com a LiberaAI."
-  )}`;
+  const clean = stripPhoneFromMessage(text) || "Olá, quero regularizar minha empresa com a LiberaAI.";
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(clean)}`;
 }
 
 export function readIntent() {
@@ -22,17 +21,24 @@ export function readIntent() {
   }
 }
 
-export function composeLeadMessage(name, phone, fallbackAsk) {
-  const ask =
-    readIntent().replace(/^Olá,?\s*/i, "") ||
-    fallbackAsk ||
-    "quero regularizar minha empresa com a LiberaAI.";
-  return `Olá, sou ${name}. Meu WhatsApp é +55 ${phone}. ${ask.charAt(0).toUpperCase()}${ask.slice(1)}`;
+export function composeLeadMessage(name, service) {
+  const who = String(name || "").trim() || "cliente";
+  const what = String(service || "").trim() || "minha empresa";
+  return stripPhoneFromMessage(`Olá, sou ${who}. Quero regularizar ${what} com a LiberaAI.`);
+}
+
+function stripPhoneFromMessage(text) {
+  return String(text || "")
+    .replace(/\s*Meu WhatsApp é[^.]*\./gi, "")
+    .replace(/\s*\+55[\s\d().-]{8,}/g, "")
+    .replace(/\s{2,}/g, " ")
+    .replace(/\s+\./g, ".")
+    .trim();
 }
 
 export function saveLeadMessage(text) {
   try {
-    sessionStorage.setItem(WA_MESSAGE_KEY, text);
+    sessionStorage.setItem(WA_MESSAGE_KEY, stripPhoneFromMessage(text));
   } catch {
     /* ignore */
   }
@@ -40,7 +46,7 @@ export function saveLeadMessage(text) {
 
 export function readLeadMessage() {
   try {
-    return sessionStorage.getItem(WA_MESSAGE_KEY) || "";
+    return stripPhoneFromMessage(sessionStorage.getItem(WA_MESSAGE_KEY) || "");
   } catch {
     return "";
   }

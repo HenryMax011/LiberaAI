@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Brand, Eyebrow, Wrap } from "../components/ui";
+import { Ambient } from "../components/Ambient";
 
 const BLOCKS = [
   { type: "lede", text: "Proteção e tratamento de dados pessoais" },
@@ -630,6 +631,7 @@ export function Privacy() {
 
   return (
     <>
+      <Ambient />
       <header className="site-header">
         <nav className="site-nav">
           <Brand to="/" />

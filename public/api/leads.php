@@ -13,7 +13,10 @@ if (!is_array($payload)) {
 }
 
 $result = process_lead($payload);
-if (!$result['success']) {
+if (!empty($result['spam'])) {
+    json_response(['success' => true, 'message' => $result['message']], 200);
+}
+if (!$result['success'] || empty($result['lead'])) {
     json_response(['success' => false, 'message' => $result['message']], $result['status']);
 }
 

@@ -17,10 +17,11 @@ Never use default fonts. Favor warm editorial restraint over flashy "AI" aesthet
 ## LiberaAI system (already committed)
 
 - **Thesis:** Foque no negócio. A gente libera as licenças.
-- **Palette:** paper `#f4f7f5` · ink `#16201c` · muted `#4d5a55` · accent `#0f766e` · warning `#f97362` · slate `#101826`
-- **Type:** Instrument Serif 400 (display) · Inter (body) · IBM Plex Mono (labels)
-- **Radius:** 10px techy · pills 999px
+- **Palette:** paper `#05070A` · ink `#FFFFFF` · muted `#8aa3a0` · accent `#00D1B2` / `#00FFC2` · warning `#f97362` · slate `#05070A`
+- **Type:** Montserrat 800 (display) · Montserrat (body e labels)
+- **Radius:** 12px cards · pills 999px
 - **Motion:** CSS + Lenis + GSAP ScrollTrigger; `prefers-reduced-motion` always
+- **Look:** dark cinematic + cyan glow, glass cards, video-first hero
 
 ## Method
 1. Tokens first, components second.

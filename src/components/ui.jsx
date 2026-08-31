@@ -15,12 +15,9 @@ export function Wrap({ className = "", children, as: Tag = "div", ...props }) {
 
 export function Brand({ to = "/", className = "", onClick }) {
   const inner = (
-    <img
-      src="/img/logo-liberaai.png"
-      alt="LiberaAI Engenharia"
-      className="brand-mark select-none"
-      draggable="false"
-    />
+    <span className="brand-lockup">
+      <img src="/img/logo-completa.png" alt="LiberaAI Engenharia" />
+    </span>
   );
 
   const cls = cn("flex items-center no-underline cursor-pointer", className);

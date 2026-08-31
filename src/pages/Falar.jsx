@@ -1,41 +1,38 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Ambient } from "../components/Ambient";
-import { Brand, Eyebrow, MarkOk, Wrap } from "../components/ui";
+import { Brand, Eyebrow, Wrap } from "../components/ui";
 import { digitsOnly, maskPhone } from "../lib/phone";
 import { composeLeadMessage, saveLeadMessage } from "../lib/whatsapp";
 import { sendLead } from "../lib/leads";
 import { goToThanks, trackGenerateLead } from "../lib/tracking";
-
-const NOTES = [
-  "Leitura inicial sem custo",
-  "Resposta imediata",
-  "São Paulo - SP",
-];
 
 const KINDS = {
   LP_HOME: {
     source: "LP_HOME",
     services: ["Falar no WhatsApp"],
     titleDoc: "WhatsApp · LiberaAI",
-    eyebrow: "WhatsApp / diagnóstico / São Paulo",
+    eyebrow: "WhatsApp · diagnóstico · São Paulo",
     intent: "quero regularizar minha empresa com a LiberaAI.",
+    waService: "minha empresa",
     thanksPath: "/obrigado/whatsapp",
   },
   LP_ALVARA_FUNCIONAMENTO: {
     source: "LP_ALVARA_FUNCIONAMENTO",
     services: ["Alvará de funcionamento"],
     titleDoc: "WhatsApp · alvará de funcionamento · LiberaAI",
-    eyebrow: "WhatsApp / alvará de funcionamento",
+    eyebrow: "WhatsApp · alvará de funcionamento",
     intent: "quero regularizar o alvará de funcionamento com a LiberaAI.",
+    waService: "o alvará de funcionamento",
     thanksPath: "/alvara-de-funcionamento/obrigado/whatsapp",
   },
   LP_VIGILANCIA_SANITARIA: {
     source: "LP_VIGILANCIA_SANITARIA",
     services: ["Vigilância sanitária"],
     titleDoc: "WhatsApp · vigilância sanitária · LiberaAI",
-    eyebrow: "WhatsApp / vigilância sanitária",
+    eyebrow: "WhatsApp · vigilância sanitária",
     intent: "quero o licenciamento sanitário com a LiberaAI.",
+    waService: "a vigilância sanitária",
     thanksPath: "/vigilancia-sanitaria/obrigado/whatsapp",
   },
 };
@@ -79,7 +76,7 @@ export function Falar() {
         source: copy.source,
         services: copy.services,
       });
-      saveLeadMessage(composeLeadMessage(name, phone, copy.intent));
+      saveLeadMessage(composeLeadMessage(name, copy.waService));
       trackGenerateLead({ source: copy.source, channel: "whatsapp" });
       goToThanks(copy.thanksPath);
     } catch (err) {
@@ -108,14 +105,6 @@ export function Falar() {
             <p className="mt-[22px] max-w-[36.25rem] text-[17.5px] font-medium leading-[1.65] text-ink-2">
               Formulário para o especialista. A leitura inicial não tem custo. Você decide se segue.
             </p>
-            <ul className="mt-8 m-0 grid list-none gap-3 p-0">
-              {NOTES.map((item) => (
-                <li key={item} className="flex items-center gap-3 text-[15px] text-ink">
-                  <MarkOk />
-                  {item}
-                </li>
-              ))}
-            </ul>
           </div>
 
           <aside className="talk-card" aria-label="Formulário de contato">

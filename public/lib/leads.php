@@ -126,6 +126,82 @@ function update_lead_backup_meta(string $file, array $meta): void
     @file_put_contents($file, $encoded, LOCK_EX);
 }
 
+function send_lead_to_leads_api(array $lead): array
+{
+    $url = trim((string) (getenv('LEADS_API_URL') ?: ''));
+    $token = trim((string) (getenv('LEADS_API_TOKEN') ?: ''));
+    if ($url === '' || $token === '' || !function_exists('curl_init')) {
+        return ['ok' => false, 'status' => 0, 'error' => 'API de leads nao configurada'];
+    }
+
+    $host = strtolower((string) (parse_url($url, PHP_URL_HOST) ?: ''));
+    $self = strtolower((string) (preg_replace('/:\d+$/', '', (string) ($_SERVER['HTTP_HOST'] ?? ''))));
+    if ($host !== '' && $self !== '' && $host === $self) {
+        return ['ok' => false, 'status' => 0, 'error' => 'LEADS_API_URL aponta para o proprio site'];
+    }
+
+    $mensagem = '';
+    if (!empty($lead['services']) && is_array($lead['services'])) {
+        $mensagem = implode(', ', $lead['services']);
+    } elseif (!empty($lead['mensagem'])) {
+        $mensagem = (string) $lead['mensagem'];
+    }
+
+    $pageUrl = (string) ($lead['pageUrl'] ?? '');
+    $pagina = (string) ($lead['pagina'] ?? '');
+    if ($pagina === '') {
+        $pagina = $pageUrl;
+    }
+
+    $payload = json_encode([
+        'nome' => (string) ($lead['name'] ?? ''),
+        'email' => (string) ($lead['email'] ?? ''),
+        'telefone' => (string) ($lead['phone'] ?? ''),
+        'mensagem' => $mensagem,
+        'origem' => 'site-institucional',
+        'empresa' => 'LIBERA_AI',
+        'pagina' => $pagina,
+        'website' => '',
+    ], JSON_UNESCAPED_UNICODE);
+
+    if ($payload === false) {
+        return ['ok' => false, 'status' => 0, 'error' => 'JSON invalido'];
+    }
+
+    $ch = curl_init($url);
+    if ($ch === false) {
+        return ['ok' => false, 'status' => 0, 'error' => 'curl_init falhou'];
+    }
+
+    curl_setopt_array($ch, [
+        CURLOPT_POST => true,
+        CURLOPT_HTTPHEADER => [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $token,
+            'Accept: application/json',
+        ],
+        CURLOPT_POSTFIELDS => $payload,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => 12,
+        CURLOPT_CONNECTTIMEOUT => 5,
+    ]);
+    $body = curl_exec($ch);
+    $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
+    curl_close($ch);
+
+    $ok = $status >= 200 && $status < 300;
+    if (!$ok) {
+        error_log('[leads] API externa HTTP ' . $status . ' ' . $curlError . ' ' . substr((string) $body, 0, 200));
+    }
+
+    return [
+        'ok' => $ok,
+        'status' => $status,
+        'error' => $ok ? null : ($curlError !== '' ? $curlError : ('HTTP ' . $status)),
+    ];
+}
+
 function send_lead_to_rd(array $lead): bool
 {
     $webhookUrl = trim((string) (getenv('RD_WEBHOOK_URL') ?: ''));
@@ -188,22 +264,30 @@ function leads_flush_response(array $response, int $status = 200): void
     flush();
 }
 
+function leads_try(callable $fn, mixed $fallback)
+{
+    try {
+        return $fn();
+    } catch (Throwable $e) {
+        error_log('[leads] ' . $e->getMessage());
+        return $fallback;
+    }
+}
+
 function leads_finish_response_and_dispatch(array $lead, array $response, int $status = 200): never
 {
     ignore_user_abort(true);
-    set_time_limit(60);
+    set_time_limit(90);
 
     $backupFile = persist_lead_backup($lead, [
         'receivedAt' => gmdate('c'),
         'emailSent' => null,
     ]);
 
-    leads_flush_response($response, $status);
-
     $emailSent = false;
     $smtpError = null;
     if (is_smtp_configured()) {
-        $emailSent = send_email_notification($lead);
+        $emailSent = (bool) leads_try(static fn () => send_email_notification($lead), false);
         if (!$emailSent) {
             $smtpError = smtp_last_response();
             error_log('[leads] Falha SMTP ao enviar lead de ' . $lead['name'] . ' (' . $lead['phone'] . ') — ' . $smtpError);
@@ -213,15 +297,24 @@ function leads_finish_response_and_dispatch(array $lead, array $response, int $s
         error_log('[leads] SMTP nao configurado para lead de ' . $lead['name']);
     }
 
+    leads_flush_response($response, $status);
+
+    $leadsApi = leads_try(
+        static fn () => send_lead_to_leads_api($lead),
+        ['ok' => false, 'status' => 0, 'error' => 'excecao no CRM']
+    );
+    $rdSent = (bool) leads_try(static fn () => dispatch_lead_notifications($lead), false);
+
     if ($backupFile !== null) {
         update_lead_backup_meta($backupFile, [
             'emailSent' => $emailSent,
             'smtpError' => $smtpError,
-            'rdSent' => dispatch_lead_notifications($lead),
+            'rdSent' => $rdSent,
+            'leadsApiSent' => is_array($leadsApi) ? !empty($leadsApi['ok']) : false,
+            'leadsApiStatus' => is_array($leadsApi) ? ($leadsApi['status'] ?? 0) : 0,
+            'leadsApiError' => is_array($leadsApi) ? ($leadsApi['error'] ?? null) : null,
             'processedAt' => gmdate('c'),
         ]);
-    } else {
-        dispatch_lead_notifications($lead);
     }
 
     exit;
@@ -229,8 +322,18 @@ function leads_finish_response_and_dispatch(array $lead, array $response, int $s
 
 function process_lead(array $payload): array
 {
-    $name = trim((string) ($payload['name'] ?? ''));
-    $phone = normalize_phone((string) ($payload['phone'] ?? ''));
+    if (trim((string) ($payload['website'] ?? '')) !== '') {
+        return [
+            'success' => true,
+            'status' => 200,
+            'message' => 'Lead recebido com sucesso.',
+            'lead' => null,
+            'spam' => true,
+        ];
+    }
+
+    $name = trim((string) ($payload['name'] ?? $payload['nome'] ?? ''));
+    $phone = normalize_phone((string) ($payload['phone'] ?? $payload['telefone'] ?? ''));
 
     if ($name === '' || strlen($name) < 3) {
         return ['success' => false, 'status' => 400, 'message' => 'Nome é obrigatório e deve ter no mínimo 3 caracteres.'];
@@ -250,14 +353,21 @@ function process_lead(array $payload): array
         }
     }
 
+    $mensagem = trim((string) ($payload['mensagem'] ?? ''));
+    if ($services === [] && $mensagem !== '') {
+        $services[] = $mensagem;
+    }
+
     $lead = [
         'name' => $name,
         'phone' => $phone,
         'email' => strtolower(trim((string) ($payload['email'] ?? ''))),
         'licenseType' => trim((string) ($payload['licenseType'] ?? '')),
         'services' => $services,
-        'source' => (string) ($payload['source'] ?? 'LP_SITE'),
-        'pageUrl' => (string) ($payload['pageUrl'] ?? 'N/A'),
+        'mensagem' => $mensagem,
+        'source' => (string) ($payload['source'] ?? $payload['origem'] ?? 'LP_SITE'),
+        'pagina' => (string) ($payload['pagina'] ?? ''),
+        'pageUrl' => (string) ($payload['pageUrl'] ?? $payload['pagina'] ?? 'N/A'),
         'ip' => get_client_ip(),
         'conversionDate' => gmdate('c'),
         'utm_source' => (string) ($payload['utm_source'] ?? ''),

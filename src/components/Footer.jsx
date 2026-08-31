@@ -18,11 +18,11 @@ export function Footer() {
           <h3 className="mono mb-4 text-on-slate">Navegação</h3>
           <ul className="m-0 grid list-none gap-2.5 p-0">
             <li><Link className="cursor-pointer text-on-slate-muted no-underline hover:text-accent-mid" to="/">Home</Link></li>
+            <li><a className="cursor-pointer text-on-slate-muted no-underline hover:text-accent-mid" href="/#quem-somos">Quem somos</a></li>
             <li><a className="cursor-pointer text-on-slate-muted no-underline hover:text-accent-mid" href="/#servicos">Serviços</a></li>
             <li><Link className="cursor-pointer text-on-slate-muted no-underline hover:text-accent-mid" to="/alvara-de-funcionamento">Alvará de funcionamento</Link></li>
             <li><Link className="cursor-pointer text-on-slate-muted no-underline hover:text-accent-mid" to="/vigilancia-sanitaria">Vigilância sanitária</Link></li>
             <li><a className="cursor-pointer text-on-slate-muted no-underline hover:text-accent-mid" href="/#solucoes">Como funciona</a></li>
-            <li><a className="cursor-pointer text-on-slate-muted no-underline hover:text-accent-mid" href="/#quem-somos">Quem somos</a></li>
             <li><a className="cursor-pointer text-on-slate-muted no-underline hover:text-accent-mid" href="/#faq">Perguntas</a></li>
             <li><Link className="cursor-pointer text-on-slate-muted no-underline hover:text-accent-mid" to="/whatsapp/?source=LP_HOME">Contato</Link></li>
             <li><Link className="cursor-pointer text-on-slate-muted no-underline hover:text-accent-mid" to="/privacidade">Política de privacidade</Link></li>

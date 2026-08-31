@@ -10,9 +10,9 @@ const SERVICE_PAGES = [
 
 const links = [
   ["#topo", "Home", "/"],
-  ["#servicos", "Serviços"],
-  ["#solucoes", "Soluções"],
   ["#quem-somos", "Quem somos"],
+  ["#servicos", "Serviços"],
+  ["#solucoes", "Como funciona"],
   ["#faq", "Dúvidas"],
 ];
 
@@ -27,7 +27,7 @@ export function Nav() {
   const onLanding = SERVICE_PAGES.some(([href]) => pathname === href);
 
   useEffect(() => {
-    const ids = ["topo", "servicos", "solucoes", "quem-somos", "faq"];
+    const ids = ["topo", "quem-somos", "servicos", "solucoes", "faq"];
     const onScroll = () => {
       setScrolled(window.scrollY > 12);
       const h = document.documentElement.scrollHeight - window.innerHeight;
@@ -153,6 +153,9 @@ export function Nav() {
             <Link to="/" onClick={goHome}>
               Home
             </Link>
+            <a href={sectionHref("#quem-somos")} onClick={close}>
+              Quem somos
+            </a>
             <a href={sectionHref("#servicos")} onClick={close}>
               Serviços
             </a>
@@ -161,7 +164,7 @@ export function Nav() {
                 {item}
               </Link>
             ))}
-            {links.slice(2).map(([href, label]) => (
+            {links.slice(3).map(([href, label]) => (
               <a key={href} href={sectionHref(href)} onClick={close}>
                 {label}
               </a>

@@ -40,7 +40,7 @@ export function Obrigado() {
               <p className="mt-3 text-[15px] leading-snug text-ink-2">
                 Recebemos seus dados. Clique abaixo para falar no WhatsApp com um especialista.
               </p>
-              <WaLink direct text={message} className="btn btn-primary mt-6 w-full">
+              <WaLink direct text={message} className="btn btn-wa mt-6 w-full">
                 <WaIcon />
                 Falar no WhatsApp
               </WaLink>

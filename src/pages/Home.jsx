@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useMotion } from "../hooks/useMotion";
 import { Ambient } from "../components/Ambient";
@@ -8,31 +8,28 @@ import { Footer, WhatsAppFab } from "../components/Footer";
 import { Box, BoxNum, Eyebrow, MarkOk, MarkX, PhotoStage, SectionHead, WaIcon, WaLink, Wrap } from "../components/ui";
 
 const CLIENTS = [
-  ["Casa do Pão de Queijo", "/img/clients/casa-do-pao.png"],
-  ["Extra", "/img/clients/extra.png"],
-  ["Flash Power", "/img/clients/flash-power.png"],
-  ["Fototica", "/img/clients/fototica.png"],
-  ["Fran's Café", "/img/clients/frans-cafe.png"],
-  ["Itaú", "/img/clients/itau.png"],
-  ["Kopenhagen", "/img/clients/kopenhagen.png"],
-  ["Lopes", "/img/clients/lopes.png"],
-  ["Lombroso Fashion Mall", "/img/clients/lombroso.png"],
-  ["Bomprato", "/img/clients/bomprato.png"],
-  ["Burger King", "/img/clients/burger-king.png"],
-  ["Viena", "/img/clients/viena.png"],
-  ["Shell Select", "/img/clients/shell-select.png"],
+  ["Burger King", "/img/clients/burger_king_branca.png"],
+  ["Viena", "/img/clients/viena_branca.png"],
+  ["Shell", "/img/clients/shell_branca.png"],
+  ["Casa do Pão de Queijo", "/img/clients/casa_do_pao_de_queijo_branca.png"],
+  ["Extra", "/img/clients/mercado_extra_branca.png"],
+  ["Fototica", "/img/clients/fototica_branca.png"],
+  ["Itaú", "/img/clients/itau_white_source.png"],
+  ["Kopenhagen", "/img/clients/kopenhagen_branca.png"],
+  ["Lopes", "/img/clients/lopes_branca.png"],
+  ["Bom Prato", "/img/clients/logo_bom_prato_branca.png"],
 ];
 
 const LANDINGS = {
   home: {
     title: "LiberaAI · alvará e licenças em São Paulo",
-    eyebrow: "Licenciamento / São Paulo / diagnóstico",
+    eyebrow: "Licenciamento · São Paulo · Diagnóstico",
     headline: (
       <>
         Regularize sua empresa com quem <em className="beat">entende</em> do assunto.
       </>
     ),
-    lede: "Tenha mais segurança para operar, crescer e aproveitar novas oportunidades.",
+    lede: "Unimos agilidade, tecnologia e inteligência para simplificar processos e regularizar sua empresa com segurança.",
     waText: "Olá, quero um orçamento da LiberaAI.",
     waPath: "/whatsapp/?source=LP_HOME",
     formPath: "/formulario",
@@ -75,10 +72,9 @@ const SERVICES = [
 ];
 
 const STEPS = [
-  ["01", "Você envia os dados", "Formulário curto com o que precisa regularizar."],
-  ["02", "Consultas públicas", "Levantamos as exigências nos órgãos e o que falta no seu CNAE."],
-  ["03", "Entrega de protocolos", "Protocolamos na prefeitura, vigilância e bombeiros e acompanhamos."],
-  ["04", "Licença na mão", "Você opera. A gente entrega o que o órgão exigiu."],
+  ["01", "Você envia os dados", "Envia seu CNPJ ou CPF."],
+  ["02", "Consultas públicas", "Levamos suas informações aos órgãos públicos e realizamos uma consulta de viabilidade."],
+  ["03", "Acompanhamento", "Acompanhamos até deferimento."],
 ];
 
 const TYPES = [
@@ -108,47 +104,245 @@ const FAQS = [
   ["01", "Quanto tempo leva para obter as licenças?", "O prazo muda com o tipo de licença e o órgão. Em casos elegíveis, o alvará pode sair em até 24 horas. Nos demais, seguimos o calendário da prefeitura, da vigilância ou dos bombeiros, com acompanhamento nosso em cada etapa."],
   ["02", "Quais documentos são necessários?", "Em geral: contrato social ou MEI, comprovante do imóvel (IPTU ou locação), planta ou memorial quando exigido, e documentos dos responsáveis. O diagnóstico inicial lista exatamente o que o seu caso pede."],
   ["03", "Vocês atendem em quais regiões?", "Capital de São Paulo e Grande SP. Confirmamos endereço e tipo de licenciamento no primeiro contato."],
-  ["04", "Posso operar sem licenças?", "Não. Operar sem o que a lei pede expõe o negócio a multa, interdição e responsabilização. Regularizar é o que deixa você operar em paz."],
+  ["04", "Posso operar sem licenças?", "Operar sem as licenças exigidas pode colocar sua empresa em risco de multas, interdição e outras penalidades. Regularizar é garantir segurança para o seu negócio operar dentro da lei e crescer com tranquilidade."],
   ["05", "O diagnóstico tem custo?", "Não. A leitura inicial do seu caso é sem custo e sem compromisso. O valor do processo só entra depois que o caminho estiver claro."],
   ["06", "Como começa o atendimento?", "Você deixa nome e WhatsApp. No mesmo dia um especialista lê o caso e aponta o que falta para operar dentro da lei."],
 ];
 
+const ABOUT_PHOTOS = [
+  ["/img/quem-somos-02.jpg", "Fachada da sede da LiberaAI Engenharia"],
+  ["/img/quem-somos-00.jpg", "Escritório da LiberaAI Engenharia"],
+  ["/img/quem-somos-01.jpg", "Equipe da LiberaAI no escritório"],
+  ["/img/quem-somos-03.jpg", "Recepção da LiberaAI Engenharia"],
+];
+
+function AboutCarousel() {
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    if (paused) return undefined;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+    const id = window.setInterval(() => {
+      setIndex((current) => (current + 1) % ABOUT_PHOTOS.length);
+    }, 4500);
+    return () => window.clearInterval(id);
+  }, [paused, index]);
+
+  return (
+    <figure
+      className="about-structure reveal"
+      aria-label="Fotos da sede e da equipe da LiberaAI Engenharia"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      {ABOUT_PHOTOS.map(([src, alt], i) => (
+        <img
+          key={src}
+          src={src}
+          alt={i === index ? alt : ""}
+          className={`about-slide${i === index ? " is-on" : ""}`}
+          decoding="async"
+          loading={i === 0 ? "eager" : "lazy"}
+        />
+      ))}
+      <span className="photo-hud photo-hud-tl" />
+      <span className="photo-hud photo-hud-tr" />
+      <span className="photo-hud photo-hud-bl" />
+      <span className="photo-hud photo-hud-br" />
+      <button
+        type="button"
+        className="about-arrow about-arrow-prev"
+        aria-label="Foto anterior"
+        onClick={() => setIndex((current) => (current - 1 + ABOUT_PHOTOS.length) % ABOUT_PHOTOS.length)}
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M15 5 8 12l7 7" />
+        </svg>
+      </button>
+      <button
+        type="button"
+        className="about-arrow about-arrow-next"
+        aria-label="Próxima foto"
+        onClick={() => setIndex((current) => (current + 1) % ABOUT_PHOTOS.length)}
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="m9 5 7 7-7 7" />
+        </svg>
+      </button>
+      <div className="about-dots" role="tablist" aria-label="Fotos">
+        {ABOUT_PHOTOS.map(([, alt], i) => (
+          <button
+            key={alt}
+            type="button"
+            role="tab"
+            aria-selected={i === index}
+            aria-label={alt}
+            className={i === index ? "is-on" : ""}
+            onClick={() => setIndex(i)}
+          />
+        ))}
+      </div>
+    </figure>
+  );
+}
+
+function formatTime(seconds) {
+  if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60)
+    .toString()
+    .padStart(2, "0");
+  return `${mins}:${secs}`;
+}
+
 function Hero({ landing }) {
   const copy = LANDINGS[landing] || LANDINGS.home;
+  const videoRef = useRef(null);
+  const [playing, setPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(0.85);
+  const [muted, setMuted] = useState(false);
+
+  const togglePlay = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) {
+      video.muted = muted;
+      video.volume = muted ? 0 : volume;
+      video.play();
+      setPlaying(true);
+      return;
+    }
+    video.pause();
+    setPlaying(false);
+  };
+
+  const onSeek = (event) => {
+    const video = videoRef.current;
+    if (!video || !video.duration) return;
+    const next = Number(event.target.value);
+    video.currentTime = next * video.duration;
+    setProgress(next);
+  };
+
+  const onVolume = (event) => {
+    const video = videoRef.current;
+    const next = Number(event.target.value);
+    setVolume(next);
+    setMuted(next === 0);
+    if (!video) return;
+    video.volume = next;
+    video.muted = next === 0;
+  };
+
+  const toggleMute = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (muted || video.volume === 0) {
+      const next = volume > 0 ? volume : 0.85;
+      video.muted = false;
+      video.volume = next;
+      setMuted(false);
+      setVolume(next);
+      return;
+    }
+    video.muted = true;
+    setMuted(true);
+  };
+
   return (
-    <section className="relative overflow-hidden pt-[7.25rem] pb-[clamp(40px,7vw,88px)] lg:pt-[8.75rem]">
-      <Wrap className="grid items-center gap-10 lg:grid-cols-[1.08fr_0.92fr] lg:gap-14">
+    <section className="hero relative overflow-hidden pt-[6.5rem] pb-[clamp(28px,5vw,56px)] lg:pt-[7.25rem]">
+      <Wrap className="grid items-center gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(280px,0.95fr)] lg:gap-10">
         <div className="hero-copy">
-          <Eyebrow className="hero-in reveal text-accent-strong">{copy.eyebrow}</Eyebrow>
-          <h1 className="display hero-in reveal mt-[18px] text-[clamp(2.05rem,7.2vw,4.6rem)]">
+          <p className="hero-kicker hero-in reveal">{copy.eyebrow}</p>
+          <h1 className="display hero-in reveal mt-4 text-[clamp(2.15rem,6.4vw,4.35rem)]">
             {copy.headline}
           </h1>
-          <p className="lede hero-in reveal mt-[22px] max-w-[36.25rem] text-[17.5px] font-medium leading-[1.65]">
+          <p className="lede hero-in reveal mt-5 max-w-[34rem] text-[16.5px] font-medium leading-[1.65]">
             {copy.lede}
           </p>
-          <div className="hero-in reveal mt-8 flex flex-wrap gap-4">
-            <WaLink to={copy.waPath} text={copy.waText} className="btn btn-wa">
+          <div className="hero-in reveal mt-8 flex flex-wrap gap-3.5">
+            <WaLink to={copy.waPath} text={copy.waText} className="btn btn-primary">
               <WaIcon />
               Falar no WhatsApp
             </WaLink>
-            <Link to={copy.formPath} className="btn btn-ghost btn-quote">
-              Faça seu orçamento aqui
+            <Link to={copy.formPath} className="btn btn-ghost">
+              Faça seu orçamento
             </Link>
           </div>
         </div>
 
-        <aside className="device hero-media" aria-label="Vídeo institucional">
-          <img src="/img/ai-17.jpg" alt="" className="hero-media-fallback" />
+        <aside className="hero-media" aria-label="Vídeo LiberaAI">
+          <img src="/img/hero-poster.jpg?v=9" alt="" className="hero-media-fallback" />
           <video
+            ref={videoRef}
             className="hero-media-video"
-            autoPlay
-            muted
-            loop
             playsInline
-            poster="/img/ai-17.jpg"
+            preload="metadata"
+            poster="/img/hero-poster.jpg?v=9"
+            onClick={togglePlay}
+            onTimeUpdate={(event) => {
+              const video = event.currentTarget;
+              if (!video.duration) return;
+              setProgress(video.currentTime / video.duration);
+            }}
+            onLoadedMetadata={(event) => setDuration(event.currentTarget.duration || 0)}
+            onEnded={() => setPlaying(false)}
           >
-            <source src="/video/hero.mp4" type="video/mp4" />
+            <source src="/video/hero.mp4?v=9" type="video/mp4" />
           </video>
+          <div className="hero-media-controls">
+            <button type="button" className="hero-ctrl-btn" aria-label={playing ? "Pausar" : "Reproduzir"} onClick={togglePlay}>
+              {playing ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <rect x="6" y="5" width="4" height="14" rx="1" />
+                  <rect x="14" y="5" width="4" height="14" rx="1" />
+                </svg>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              )}
+            </button>
+            <input
+              className="hero-seek"
+              type="range"
+              min="0"
+              max="1"
+              step="0.001"
+              value={progress}
+              aria-label="Posição do vídeo"
+              onChange={onSeek}
+            />
+            <span className="hero-time">
+              {formatTime(progress * duration)} / {formatTime(duration)}
+            </span>
+            <button type="button" className="hero-ctrl-btn" aria-label={muted || volume === 0 ? "Ativar som" : "Silenciar"} onClick={toggleMute}>
+              {muted || volume === 0 ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                  <path d="M11 5 6 9H3v6h3l5 4V5z" />
+                  <path d="m16 9 5 6M21 9l-5 6" />
+                </svg>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+                  <path d="M11 5 6 9H3v6h3l5 4V5z" />
+                  <path d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8 8 0 0 1 0 12" />
+                </svg>
+              )}
+            </button>
+            <input
+              className="hero-volume"
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              value={muted ? 0 : volume}
+              aria-label="Volume"
+              onChange={onVolume}
+            />
+          </div>
         </aside>
       </Wrap>
     </section>
@@ -177,21 +371,17 @@ export function Home({ landing = "home" }) {
       <main id="topo" className="relative z-1">
         <Hero landing={landing} />
 
-        <div className="fx-proof relative z-5 -mt-5">
+        <div className="fx-proof relative z-5 mt-2">
           <Wrap className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {[
               [
-                "Atendimento",
-                "Imediato",
-                false,
+                "Atendimento imediato",
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M13 3 5.8 13.2h5.4L11 21l7.4-11.4h-5.6z" />
                 </svg>,
               ],
               [
-                "Parcelamos no",
-                "Boleto e cartão",
-                false,
+                "Parcelamos no boleto e cartão",
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="6" width="18" height="13" rx="2" />
                   <path d="M3 10h18" />
@@ -199,18 +389,14 @@ export function Home({ landing = "home" }) {
                 </svg>,
               ],
               [
-                "Há mais de",
-                "20 anos na área",
-                false,
+                "Há mais de 20 anos na área",
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 3l7 3v5c0 4.4-3 8-7 10-4-2-7-5.6-7-10V6z" />
                   <path d="M8.5 12.2l2.2 2.2 4.8-5" />
                 </svg>,
               ],
               [
-                "Empresas atendidas",
-                null,
-                true,
+                "+5.000 empresas atendidas",
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="9" cy="8" r="2.6" />
                   <path d="M4.6 17.2c.5-2.4 2.2-3.7 4.4-3.7s3.9 1.3 4.4 3.7" />
@@ -218,29 +404,17 @@ export function Home({ landing = "home" }) {
                   <path d="M14.4 17.2c.4-1.8 1.6-2.8 3.3-2.8 1.5 0 2.7.8 3.2 2.2" />
                 </svg>,
               ],
-            ].map(([kicker, title, metric, icon]) => (
-              <Box key={kicker} className="reveal flex min-w-0 items-center gap-3 py-5">
+            ].map(([label, icon]) => (
+              <Box key={label} className="reveal flex min-w-0 items-center gap-3">
                 <span className="area-icon shrink-0" aria-hidden="true">{icon}</span>
-                {metric ? (
-                  <div>
-                    <strong className="display m-0 text-[1.55rem] leading-none text-accent">
-                      +<span data-count="5000">0</span>
-                    </strong>
-                    <span className="mono mt-1.5 block text-[11px] tracking-[0.16em] text-ink-2">{kicker}</span>
-                  </div>
-                ) : (
-                  <div>
-                    <span className="mono block text-[11px] tracking-[0.16em] text-muted">{kicker}</span>
-                    <strong className="display mt-1 m-0 block text-[1.2rem] leading-none">{title}</strong>
-                  </div>
-                )}
+                <strong className="proof-label">{label}</strong>
               </Box>
             ))}
           </Wrap>
         </div>
 
-        <div className="relative z-5 mt-10">
-          <p className="mono mb-4 px-6 text-center text-accent-mid">Empresas que confiam na LiberaAI</p>
+        <div className="band-wrap relative z-5 mt-10">
+          <p className="band-head">Empresas que confiam na Libera AI</p>
           <div className="band">
             <div className="band-track">
             {[...CLIENTS, ...CLIENTS].map(([name, src], i) => (
@@ -250,7 +424,24 @@ export function Home({ landing = "home" }) {
             ))}
             </div>
           </div>
+          <p className="band-more">imagens ilustrativas</p>
         </div>
+
+        <section id="quem-somos" className="fx-about relative overflow-hidden py-[clamp(64px,8vw,104px)]">
+          <Wrap className="grid items-stretch gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
+            <div>
+              <Eyebrow className="reveal">Quem somos</Eyebrow>
+              <h2 className="display reveal mt-3.5 text-[clamp(2.5rem,1.7rem+3.2vw,4.1rem)]">
+                Regularização empresarial simples e <em className="beat">inteligente</em>.
+              </h2>
+              <p className="reveal mt-[18px] max-w-[36.25rem] text-[17px] leading-[1.6] text-white">A LiberaAI Engenharia é especializada em regularização empresarial, alvarás de funcionamento e licenciamentos. Unimos conhecimento técnico, tecnologia e inteligência artificial para tornar processos burocráticos mais simples, rápidos e seguros.</p>
+              <p className="reveal mt-[18px] max-w-[36.25rem] text-[17px] leading-[1.6] text-white">Nosso trabalho é conduzir cada etapa com clareza e eficiência, oferecendo soluções personalizadas para que empresas possam operar de forma regular, evitar imprevistos e seguir em frente com tranquilidade.</p>
+              <p className="reveal mt-[18px] max-w-[36.25rem] text-[17px] leading-[1.6] text-white">Mais do que cuidar de documentos, ajudamos negócios a destravar projetos, ganhar tempo e transformar burocracia em progresso.</p>
+              <p className="reveal mt-[18px] max-w-[36.25rem] text-[17px] font-semibold leading-[1.6] text-white">LiberaAI Engenharia. Tecnologia para simplificar. Segurança para avançar.</p>
+            </div>
+            <AboutCarousel />
+          </Wrap>
+        </section>
 
         <section id="servicos" className="fx-services relative overflow-hidden py-[clamp(64px,8vw,104px)]">
           <Wrap>
@@ -289,10 +480,10 @@ export function Home({ landing = "home" }) {
           <Wrap>
             <SectionHead
               eyebrow="Como funciona"
-              title={<>Quatro passos. Sem <em className="beat">teatro</em>.</>}
+              title={<>Três passos. Sem <em className="beat">teatro</em>.</>}
               lede="Você descreve o caso. Nós lemos a documentação, protocolamos e devolvemos a empresa regularizada."
             />
-            <div className="steps-rail relative mt-12 grid gap-3.5 lg:grid-cols-4">
+            <div className="steps-rail relative mt-12 grid gap-3.5 lg:grid-cols-3">
               <div className="rail-lights" aria-hidden="true">
                 <span className="rail-light" />
                 <span className="rail-light" />
@@ -359,7 +550,7 @@ export function Home({ landing = "home" }) {
               </Box>
             </div>
             <ol className="steps-flow reveal mt-9 flex list-none flex-wrap items-center gap-0 p-0">
-              {["Regularização", "Adequação", "Pré-vistoria"].map((item, i) => (
+              {["Adequação", "Regularização", "Pré-vistoria"].map((item, i) => (
                 <li key={item} className="flex items-center gap-2.5 py-2.5 pr-1 text-sm font-medium text-ink-2 not-last:after:mx-3.5 not-last:after:h-px not-last:after:w-9 not-last:after:bg-linear-to-r not-last:after:from-accent-mid not-last:after:to-transparent not-last:after:shadow-[0_0_8px_rgba(45,212,191,0.5)] not-last:after:content-['']">
                   <span className="mono text-accent">0{i + 1}</span> {item}
                 </li>
@@ -394,56 +585,6 @@ export function Home({ landing = "home" }) {
           </Wrap>
         </section>
 
-        <section id="quem-somos" className="fx-about relative overflow-hidden py-[clamp(64px,8vw,104px)]">
-          <Wrap className="grid items-start gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
-            <div>
-              <Eyebrow className="reveal">Quem somos</Eyebrow>
-              <h2 className="display reveal mt-3.5 text-[clamp(2.5rem,1.7rem+3.2vw,4.1rem)]">
-                Regularização empresarial mais simples, ágil e <em className="beat">inteligente</em>
-              </h2>
-              <p className="reveal mt-[18px] max-w-[36.25rem] text-[17px] leading-[1.6] text-white">A LiberaAI nasceu para transformar a forma como empresas lidam com processos de regularização e burocracia.</p>
-              <p className="reveal mt-[18px] max-w-[36.25rem] text-[17px] leading-[1.6] text-white">Atuamos na regularização empresarial, oferecendo soluções como alvará de funcionamento e outros processos necessários para manter empresas em conformidade. Unimos conhecimento técnico, atendimento próximo e o poder da inteligência artificial para tornar cada etapa mais organizada, rápida e eficiente.</p>
-            </div>
-            <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-1">
-              <Box className="reveal flex flex-col">
-                <div className="flex items-center justify-between">
-                  <span className="area-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M12 3l7 3v5c0 4.4-3 8-7 10-4-2-7-5.6-7-10V6z" />
-                      <path d="M8.5 12.2l2.2 2.2 4.8-5" />
-                    </svg>
-                  </span>
-                  <BoxNum sm>01</BoxNum>
-                </div>
-                <h3 className="display mt-5 m-0 text-[1.15rem]">Com a licença em dia</h3>
-                <ul className="mt-3.5 grid list-none gap-2 border-t border-accent/12 pt-3">
-                  {["Regularização e conformidade legal", "Segurança para o empreendimento", "Crédito, parceria e contrato mais fáceis", "Acesso a benefícios e incentivos"].map((item) => (
-                    <li key={item} className="flex items-center gap-2.5 text-sm text-ink-2"><MarkOk />{item}</li>
-                  ))}
-                </ul>
-              </Box>
-              <Box className="reveal flex flex-col" off>
-                <div className="flex items-center justify-between">
-                  <span className="area-icon area-icon-off" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M12 9v4.2" />
-                      <path d="M12 16.6h.01" />
-                      <path d="M10.3 4.9 2.8 18.2A2 2 0 0 0 4.5 21h15a2 2 0 0 0 1.7-2.8L13.7 4.9a2 2 0 0 0-3.4 0z" />
-                    </svg>
-                  </span>
-                  <BoxNum sm>02</BoxNum>
-                </div>
-                <h3 className="display mt-5 m-0 text-[1.15rem]">Operar sem licença</h3>
-                <ul className="mt-3.5 grid list-none gap-2 border-t border-coral/18 pt-3">
-                  {["Risco de multa e interdição", "Dano à reputação", "Crédito e financiamento mais duros", "Negócio que não fecha"].map((item) => (
-                    <li key={item} className="flex items-center gap-2.5 text-sm text-ink-2"><MarkX />{item}</li>
-                  ))}
-                </ul>
-              </Box>
-            </div>
-          </Wrap>
-        </section>
-
         <section id="contato" className="fx-cta relative py-[clamp(64px,8vw,104px)]">
           <Wrap>
             <div className="cta-depth relative isolate overflow-hidden rounded-[20px] border border-accent-mid/18 px-[clamp(20px,5vw,56px)] py-[clamp(28px,5vw,56px)] text-center text-on-slate shadow-canvas">
@@ -460,9 +601,9 @@ export function Home({ landing = "home" }) {
                   <span>Sem compromisso</span>
                 </div>
                 <div className="mt-7 flex justify-center">
-                  <WaLink text="Olá, quero regularizar minha empresa com a LiberaAI." className="btn btn-on-dark">Falar com especialista →</WaLink>
+                  <WaLink text="Olá, quero regularizar minha empresa com a LiberaAI." className="btn btn-on-dark">Falar no WhatsApp</WaLink>
                 </div>
-                <p className="mono mt-4 text-[#9aa7b8]">WhatsApp · menos de um minuto</p>
+                <p className="mono mt-4 text-[#9aa7b8]">(RESPOSTA IMEDIATA)</p>
               </div>
             </div>
           </Wrap>
