@@ -13,6 +13,7 @@ const links = [
   ["#quem-somos", "Quem somos"],
   ["#servicos", "Serviços"],
   ["#solucoes", "Como funciona"],
+  ["#contato", "Contato"],
   ["#faq", "Dúvidas"],
 ];
 
@@ -27,7 +28,7 @@ export function Nav() {
   const onLanding = SERVICE_PAGES.some(([href]) => pathname === href);
 
   useEffect(() => {
-    const ids = ["topo", "quem-somos", "servicos", "solucoes", "faq"];
+    const ids = ["topo", "quem-somos", "servicos", "solucoes", "contato", "faq"];
     const onScroll = () => {
       setScrolled(window.scrollY > 12);
       const h = document.documentElement.scrollHeight - window.innerHeight;
@@ -169,6 +170,9 @@ export function Nav() {
                 {label}
               </a>
             ))}
+            <Link to="/privacidade" onClick={close}>
+              Privacidade
+            </Link>
             <Link to="/formulario" onClick={close}>
               Falar agora
             </Link>

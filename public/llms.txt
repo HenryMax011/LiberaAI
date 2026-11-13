@@ -1,0 +1,39 @@
+# LiberaAI Engenharia
+
+> Regularização empresarial em São Paulo: alvará de funcionamento, vigilância sanitária, AVCB/CLCB e licenças especiais, com diagnóstico inicial sem custo.
+
+A LiberaAI Engenharia (razão social LIBERAAI ENGENHARIA LTDA, CNPJ 68.648.512/0001-00) regulariza empresas na capital e na Grande São Paulo. Une engenharia, tecnologia e inteligência artificial para obter e acompanhar licenças junto à prefeitura, à vigilância sanitária e ao Corpo de Bombeiros.
+
+## Serviços
+
+- Alvará de funcionamento (ALF e ALF-C)
+- Licenciamento sanitário / vigilância sanitária
+- AVCB, CLCB e APPCI (bombeiros)
+- CETESB e licenças ambientais
+- POP, manual de boas práticas e DCFF
+- Regularização, adequação e pré-vistoria
+
+## Páginas
+
+- [Home](https://liberaai.eng.br/): visão geral da LiberaAI Engenharia
+- [Quem somos](https://liberaai.eng.br/#quem-somos): sobre a empresa
+- [Serviços](https://liberaai.eng.br/#servicos): lista de licenças
+- [Alvará de funcionamento](https://liberaai.eng.br/alvara-de-funcionamento): página de alvará
+- [Vigilância sanitária](https://liberaai.eng.br/vigilancia-sanitaria): página de licenciamento sanitário
+- [Como funciona](https://liberaai.eng.br/#solucoes): três passos do atendimento
+- [Contato](https://liberaai.eng.br/#contato): WhatsApp e orçamento
+- [Formulário](https://liberaai.eng.br/formulario): pedido de diagnóstico
+- [WhatsApp](https://liberaai.eng.br/whatsapp): fale com um especialista
+- [Política de privacidade](https://liberaai.eng.br/privacidade): LGPD
+- [Sobre (markdown)](https://liberaai.eng.br/about.md): resumo em texto para agentes de IA
+
+## Contato
+
+- WhatsApp: https://wa.me/5511933853226
+- E-mail: liberaaiengenharia@gmail.com
+- Endereço: Rua Perucaba, 97 — São Paulo - SP — Brasil
+- Site: https://liberaai.eng.br/
+
+## Optional
+
+- [llms-full.txt](https://liberaai.eng.br/llms-full.txt): descrição estendida para agentes

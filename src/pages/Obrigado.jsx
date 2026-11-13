@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Ambient } from "../components/Ambient";
+import { Seo } from "../components/Seo";
 import { Brand, WaIcon, WaLink, Wrap } from "../components/ui";
 import { readLeadMessage } from "../lib/whatsapp";
 
@@ -12,18 +13,15 @@ export function Obrigado() {
   const fromWhatsApp = pathname.includes("/obrigado/whatsapp");
 
   useEffect(() => {
-    document.title = "Muito obrigado · LiberaAI";
     window.scrollTo(0, 0);
     if (pathname.startsWith("/home/obrigado")) {
       navigate(pathname.replace(/^\/home/, "") || "/obrigado/formulario", { replace: true });
     }
-    return () => {
-      document.title = "LiberaAI · alvará e licenças em São Paulo";
-    };
   }, [fromWhatsApp, pathname, navigate]);
 
   return (
     <>
+      <Seo title="Muito obrigado · LiberaAI" description="Recebemos seu pedido. A LiberaAI entra em contato em breve." path={pathname} noIndex />
       <Ambient />
       <header className="site-header">
         <nav className="site-nav">

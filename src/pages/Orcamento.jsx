@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Ambient } from "../components/Ambient";
+import { Seo } from "../components/Seo";
 import { Brand, Eyebrow, Wrap } from "../components/ui";
 import { digitsOnly, maskPhone } from "../lib/phone";
 import { composeLeadMessage, saveLeadMessage } from "../lib/whatsapp";
@@ -27,7 +28,7 @@ const KINDS = {
   alvara: {
     source: "LP_ALVARA_FUNCIONAMENTO",
     services: ["Alvará de funcionamento"],
-    titleDoc: "Orçamento · alvará de funcionamento · LiberaAI",
+    titleDoc: "Orçamento · Alvará de funcionamento · LiberaAI",
     eyebrow: "Orçamento · alvará de funcionamento",
     heading: (
       <>
@@ -66,11 +67,7 @@ export function Orcamento({ kind = "default" }) {
   const copy = KINDS[kind] || KINDS.default;
 
   useEffect(() => {
-    document.title = copy.titleDoc;
     window.scrollTo(0, 0);
-    return () => {
-      document.title = "LiberaAI · alvará e licenças em São Paulo";
-    };
   }, [copy.titleDoc]);
 
   const onSubmit = async (ev) => {
@@ -99,6 +96,11 @@ export function Orcamento({ kind = "default" }) {
 
   return (
     <>
+      <Seo
+        title={copy.titleDoc}
+        description="Peça o diagnóstico da LiberaAI: nome e WhatsApp. Leitura inicial sem custo para regularizar sua empresa em São Paulo."
+        path={kind === "alvara" ? "/formulario/alvara-de-funcionamento" : kind === "vigilancia" ? "/formulario/vigilancia-sanitaria" : "/formulario"}
+      />
       <Ambient />
       <header className="site-header">
         <nav className="site-nav">

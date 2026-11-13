@@ -15,7 +15,7 @@ export function Footer() {
           </WaLink>
         </div>
         <div>
-          <h3 className="mono mb-4 text-on-slate">Navegação</h3>
+          <p className="mono mb-4 text-on-slate">Navegação</p>
           <ul className="m-0 grid list-none gap-2.5 p-0">
             <li><Link className="cursor-pointer text-on-slate-muted no-underline hover:text-accent-mid" to="/">Home</Link></li>
             <li><a className="cursor-pointer text-on-slate-muted no-underline hover:text-accent-mid" href="/#quem-somos">Quem somos</a></li>
@@ -29,15 +29,17 @@ export function Footer() {
           </ul>
         </div>
         <div>
-          <h3 className="mono mb-4 text-on-slate">Contato</h3>
+          <p className="mono mb-4 text-on-slate">Contato</p>
           <ul className="m-0 grid list-none gap-2.5 p-0">
-            <li>contato@liberaai.com.br</li>
-            <li>(11) 99999-9999</li>
+            <li><a className="cursor-pointer text-on-slate-muted no-underline hover:text-accent-mid" href="mailto:liberaaiengenharia@gmail.com">liberaaiengenharia@gmail.com</a></li>
+            <li><a className="cursor-pointer text-on-slate-muted no-underline hover:text-accent-mid" href="tel:+5511933853226">(11) 93385-3226</a></li>
+            <li><a className="cursor-pointer text-on-slate-muted no-underline hover:text-accent-mid" href="/#contato">Fale conosco</a></li>
+            <li>CNPJ 68.648.512/0001-00</li>
           </ul>
         </div>
       </Wrap>
       <Wrap className="mt-12">
-        <h3 className="mono mb-4 text-on-slate">Endereço</h3>
+        <p className="mono mb-4 text-on-slate">Endereço</p>
         <p className="m-0 flex items-start gap-2.5 text-on-slate">
           <svg className="mt-0.5 shrink-0 text-accent-mid" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
             <path d="M12 21s7-5.4 7-11a7 7 0 1 0-14 0c0 5.6 7 11 7 11z" />

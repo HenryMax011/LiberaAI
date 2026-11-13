@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useMotion } from "../hooks/useMotion";
 import { Ambient } from "../components/Ambient";
-import { ConvertBar } from "../components/ConvertBar";
 import { Nav } from "../components/Nav";
 import { Footer, WhatsAppFab } from "../components/Footer";
-import { Box, BoxNum, Eyebrow, MarkOk, MarkX, PhotoStage, SectionHead, WaIcon, WaLink, Wrap } from "../components/ui";
+import { Seo } from "../components/Seo";
+import { Box, BoxNum, Eyebrow, MarkOk, MarkX, SectionHead, WaIcon, WaLink, Wrap } from "../components/ui";
+import { FAQS as FAQ_PAIRS, SITE_DESCRIPTION, faqPageSchema, graphSchema } from "../lib/seo";
 
 const CLIENTS = [
   ["Burger King", "/img/clients/burger_king_branca.png"],
@@ -20,9 +21,16 @@ const CLIENTS = [
   ["Bom Prato", "/img/clients/logo_bom_prato_branca.png"],
 ];
 
+const LANDING_PATHS = {
+  home: "/",
+  alvara: "/alvara-de-funcionamento",
+  vigilancia: "/vigilancia-sanitaria",
+};
+
 const LANDINGS = {
   home: {
-    title: "LiberaAI · alvará e licenças em São Paulo",
+    title: "LiberaAI · Alvará e licenças em São Paulo",
+    description: SITE_DESCRIPTION,
     eyebrow: "Licenciamento · São Paulo · Diagnóstico",
     headline: (
       <>
@@ -32,10 +40,10 @@ const LANDINGS = {
     lede: "Unimos agilidade, tecnologia e inteligência para simplificar processos e regularizar sua empresa com segurança.",
     waText: "Olá, quero um orçamento da LiberaAI.",
     waPath: "/whatsapp/?source=LP_HOME",
-    formPath: "/formulario",
   },
   alvara: {
     title: "Alvará de funcionamento · LiberaAI",
+    description: "Obtenção e regularização de alvará de funcionamento em São Paulo, com análise, documentação e acompanhamento até o deferimento.",
     eyebrow: "Especialistas em alvará de funcionamento",
     headline: (
       <>
@@ -45,10 +53,10 @@ const LANDINGS = {
     lede: "Cuidamos da análise, documentação e acompanhamento para sua empresa funcionar dentro da lei.",
     waText: "Olá, quero regularizar o alvará de funcionamento com a LiberaAI.",
     waPath: "/whatsapp/?source=LP_ALVARA_FUNCIONAMENTO",
-    formPath: "/formulario/alvara-de-funcionamento",
   },
   vigilancia: {
     title: "Vigilância sanitária · LiberaAI",
+    description: "Licenciamento sanitário em São Paulo: vigilância sanitária, PGRSS e documentação para o estabelecimento operar dentro da lei.",
     eyebrow: "Especialistas em licenciamento sanitário",
     headline: (
       <>
@@ -58,7 +66,6 @@ const LANDINGS = {
     lede: "Regularizamos seu estabelecimento para operar com tranquilidade e ficar dentro da lei.",
     waText: "Olá, quero o licenciamento sanitário com a LiberaAI.",
     waPath: "/whatsapp/?source=LP_VIGILANCIA_SANITARIA",
-    formPath: "/formulario/vigilancia-sanitaria",
   },
 };
 
@@ -100,14 +107,7 @@ const TYPE_ICONS = [
   </svg>,
 ];
 
-const FAQS = [
-  ["01", "Quanto tempo leva para obter as licenças?", "O prazo muda com o tipo de licença e o órgão. Em casos elegíveis, o alvará pode sair em até 24 horas. Nos demais, seguimos o calendário da prefeitura, da vigilância ou dos bombeiros, com acompanhamento nosso em cada etapa."],
-  ["02", "Quais documentos são necessários?", "Em geral: contrato social ou MEI, comprovante do imóvel (IPTU ou locação), planta ou memorial quando exigido, e documentos dos responsáveis. O diagnóstico inicial lista exatamente o que o seu caso pede."],
-  ["03", "Vocês atendem em quais regiões?", "Capital de São Paulo e Grande SP. Confirmamos endereço e tipo de licenciamento no primeiro contato."],
-  ["04", "Posso operar sem licenças?", "Operar sem as licenças exigidas pode colocar sua empresa em risco de multas, interdição e outras penalidades. Regularizar é garantir segurança para o seu negócio operar dentro da lei e crescer com tranquilidade."],
-  ["05", "O diagnóstico tem custo?", "Não. A leitura inicial do seu caso é sem custo e sem compromisso. O valor do processo só entra depois que o caminho estiver claro."],
-  ["06", "Como começa o atendimento?", "Você deixa nome e WhatsApp. No mesmo dia um especialista lê o caso e aponta o que falta para operar dentro da lei."],
-];
+const FAQS = FAQ_PAIRS.map(([q, a], i) => [String(i + 1).padStart(2, "0"), q, a]);
 
 const ABOUT_PHOTOS = [
   ["/img/quem-somos-02.jpg", "Fachada da sede da LiberaAI Engenharia"],
@@ -268,9 +268,6 @@ function Hero({ landing }) {
               <WaIcon />
               Falar no WhatsApp
             </WaLink>
-            <Link to={copy.formPath} className="btn btn-ghost">
-              Faça seu orçamento
-            </Link>
           </div>
         </div>
 
@@ -355,7 +352,6 @@ export function Home({ landing = "home" }) {
   useMotion();
 
   useEffect(() => {
-    document.title = copy.title;
     const { hash } = window.location;
     if (!hash) return undefined;
     const id = window.setTimeout(() => {
@@ -366,6 +362,12 @@ export function Home({ landing = "home" }) {
 
   return (
     <>
+      <Seo
+        title={copy.title}
+        description={copy.description}
+        path={LANDING_PATHS[landing] || "/"}
+        jsonLd={graphSchema([faqPageSchema()])}
+      />
       <Ambient />
       <Nav />
       <main id="topo" className="relative z-1">
@@ -375,37 +377,57 @@ export function Home({ landing = "home" }) {
           <Wrap className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {[
               [
-                "Atendimento imediato",
+                "alvara",
+                <>
+                  Alvará de
+                  <br />
+                  funcionamento
+                </>,
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M13 3 5.8 13.2h5.4L11 21l7.4-11.4h-5.6z" />
+                  <path d="M14 3H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8z" />
+                  <path d="M14 3v5h5" />
+                  <path d="M9 13h6" />
+                  <path d="M9 17h4" />
                 </svg>,
               ],
               [
-                "Parcelamos no boleto e cartão",
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="6" width="18" height="13" rx="2" />
-                  <path d="M3 10h18" />
-                  <path d="M7 15h3" />
-                </svg>,
-              ],
-              [
-                "Há mais de 20 anos na área",
+                "vigilancia",
+                <>
+                  Vigilância
+                  <br />
+                  sanitária
+                </>,
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 3l7 3v5c0 4.4-3 8-7 10-4-2-7-5.6-7-10V6z" />
                   <path d="M8.5 12.2l2.2 2.2 4.8-5" />
                 </svg>,
               ],
               [
-                "+5.000 empresas atendidas",
+                "bombeiros",
+                <>
+                  AVCB / CLCB
+                  <br />
+                  bombeiros
+                </>,
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="9" cy="8" r="2.6" />
-                  <path d="M4.6 17.2c.5-2.4 2.2-3.7 4.4-3.7s3.9 1.3 4.4 3.7" />
-                  <circle cx="16.2" cy="8.6" r="2.2" />
-                  <path d="M14.4 17.2c.4-1.8 1.6-2.8 3.3-2.8 1.5 0 2.7.8 3.2 2.2" />
+                  <path d="M12 21c3.6-2.2 6-6 6-10.2C18 6.2 14.8 3.4 12 2 9.2 3.4 6 6.2 6 10.8 6 15 8.4 18.8 12 21z" />
+                  <path d="M10 14.5c0 1.4 1 2.5 2 2.5s2-1.1 2-2.5c0-1.5-1.4-2.3-2-4-.6 1.7-2 2.5-2 4z" />
                 </svg>,
               ],
-            ].map(([label, icon]) => (
-              <Box key={label} className="reveal flex min-w-0 items-center gap-3">
+              [
+                "especiais",
+                <>
+                  Licenças
+                  <br />
+                  especiais
+                </>,
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M12 7.4l1.3 2.7 3 .4-2.2 2.1.6 3-2.7-1.5-2.7 1.5.6-3-2.2-2.1 3-.4z" />
+                </svg>,
+              ],
+            ].map(([key, label, icon]) => (
+              <Box key={key} className="reveal flex min-w-0 items-center gap-3">
                 <span className="area-icon shrink-0" aria-hidden="true">{icon}</span>
                 <strong className="proof-label">{label}</strong>
               </Box>
@@ -414,7 +436,7 @@ export function Home({ landing = "home" }) {
         </div>
 
         <div className="band-wrap relative z-5 mt-10">
-          <p className="band-head">Empresas que confiam na Libera AI</p>
+          <h2 className="band-head">Empresas que confiam na Libera AI</h2>
           <div className="band">
             <div className="band-track">
             {[...CLIENTS, ...CLIENTS].map(([name, src], i) => (
@@ -587,8 +609,7 @@ export function Home({ landing = "home" }) {
 
         <section id="contato" className="fx-cta relative py-[clamp(64px,8vw,104px)]">
           <Wrap>
-            <div className="cta-depth relative isolate overflow-hidden rounded-[20px] border border-accent-mid/18 px-[clamp(20px,5vw,56px)] py-[clamp(28px,5vw,56px)] text-center text-on-slate shadow-canvas">
-              <PhotoStage src="/img/ai-17.jpg" tone="dark" />
+            <div className="cta-depth relative overflow-hidden rounded-[20px] px-[clamp(20px,5vw,56px)] py-[clamp(28px,5vw,56px)] text-center text-on-slate">
               <div className="reveal relative z-1">
                 <Eyebrow className="justify-center text-[#99f6e4] before:bg-[#99f6e4]/70">
                   <span className="live inline-block" /> Especialistas online
@@ -630,10 +651,10 @@ export function Home({ landing = "home" }) {
                       className="flex w-full cursor-pointer items-center justify-between gap-4 border-0 bg-transparent px-4 py-[18px] text-left text-ink"
                       onClick={() => setFaqOpen(open ? null : i)}
                     >
-                      <span className="flex items-start gap-3.5 font-display text-[1.08rem] leading-snug font-extrabold">
+                      <h3 className="m-0 flex items-start gap-3.5 font-display text-[1.08rem] leading-snug font-extrabold">
                         <BoxNum sm>{n}</BoxNum>
                         {q}
-                      </span>
+                      </h3>
                       <span className={`faq-toggle${open ? " is-open" : ""}`} aria-hidden="true" />
                     </button>
                     <div className={`overflow-hidden transition-[max-height] duration-300 ${open ? "max-h-[360px]" : "max-h-0"}`}>
@@ -648,7 +669,6 @@ export function Home({ landing = "home" }) {
       </main>
       <Footer />
       <WhatsAppFab />
-      <ConvertBar waPath={copy.waPath} waText={copy.waText} />
     </>
   );
 }

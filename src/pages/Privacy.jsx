@@ -1,7 +1,7 @@
-import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Brand, Eyebrow, Wrap } from "../components/ui";
 import { Ambient } from "../components/Ambient";
+import { Seo } from "../components/Seo";
 
 const BLOCKS = [
   { type: "lede", text: "Proteção e tratamento de dados pessoais" },
@@ -625,12 +625,13 @@ function Block({ block }) {
 export function Privacy() {
   const year = new Date().getFullYear();
 
-  useEffect(() => {
-    document.title = "Política de privacidade · LiberaAI";
-  }, []);
-
   return (
     <>
+      <Seo
+        title="Política de privacidade · LiberaAI"
+        description="Política de privacidade da LiberaAI Engenharia (LGPD): dados coletados, finalidades, direitos do titular e canais de contato."
+        path="/privacidade"
+      />
       <Ambient />
       <header className="site-header">
         <nav className="site-nav">

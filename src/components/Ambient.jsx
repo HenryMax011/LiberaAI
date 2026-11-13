@@ -1,10 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 export function Ambient() {
-  const bgRef = useRef(null);
-
   useEffect(() => {
-    const bg = bgRef.current;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const fine = window.matchMedia("(pointer: fine)").matches;
     const wide = window.matchMedia("(min-width: 1024px)").matches;
@@ -12,11 +9,11 @@ export function Ambient() {
 
     const card = document.querySelector(".cta-depth");
     const cardShift = card?.querySelector(".photo-stage-shift");
-    const layers = wide && bg
-      ? [bg, ...[...document.querySelectorAll(".photo-stage-shift")].filter((el) => el !== cardShift)]
+    const layers = wide
+      ? [...document.querySelectorAll(".photo-stage-shift")].filter((el) => el !== cardShift)
       : [];
-    const amount = new Map([[bg, 28]]);
-    layers.slice(1).forEach((el) => amount.set(el, 18));
+    const amount = new Map();
+    layers.forEach((el) => amount.set(el, 18));
 
     let mx = 0;
     let my = 0;
@@ -52,8 +49,7 @@ export function Ambient() {
 
       layers.forEach((el) => {
         const n = amount.get(el) || 16;
-        const scale = el === bg ? 1.1 : 1.12;
-        el.style.transform = `translate3d(${(cx * n).toFixed(2)}px, ${(cy * n).toFixed(2)}px, 0) scale(${scale})`;
+        el.style.transform = `translate3d(${(cx * n).toFixed(2)}px, ${(cy * n).toFixed(2)}px, 0) scale(1.12)`;
       });
 
       if (card) {
@@ -66,7 +62,7 @@ export function Ambient() {
       raf = requestAnimationFrame(tick);
     };
 
-    if (wide) window.addEventListener("mousemove", onMove, { passive: true });
+    if (wide && layers.length) window.addEventListener("mousemove", onMove, { passive: true });
     if (card) {
       card.addEventListener("mousemove", onCardMove);
       card.addEventListener("mouseleave", onCardLeave);
@@ -90,7 +86,7 @@ export function Ambient() {
 
   return (
     <div className="ambient" aria-hidden="true">
-      <div className="ambient-bg" ref={bgRef} />
+      <div className="ambient-bg" />
       <div className="ambient-veil" />
     </div>
   );

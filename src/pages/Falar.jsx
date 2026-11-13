@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Ambient } from "../components/Ambient";
+import { Seo } from "../components/Seo";
 import { Brand, Eyebrow, Wrap } from "../components/ui";
 import { digitsOnly, maskPhone } from "../lib/phone";
 import { composeLeadMessage, saveLeadMessage } from "../lib/whatsapp";
@@ -20,7 +21,7 @@ const KINDS = {
   LP_ALVARA_FUNCIONAMENTO: {
     source: "LP_ALVARA_FUNCIONAMENTO",
     services: ["Alvará de funcionamento"],
-    titleDoc: "WhatsApp · alvará de funcionamento · LiberaAI",
+    titleDoc: "WhatsApp · Alvará de funcionamento · LiberaAI",
     eyebrow: "WhatsApp · alvará de funcionamento",
     intent: "quero regularizar o alvará de funcionamento com a LiberaAI.",
     waService: "o alvará de funcionamento",
@@ -54,11 +55,7 @@ export function Falar() {
   }, [params, sourceKey, navigate]);
 
   useEffect(() => {
-    document.title = copy.titleDoc;
     window.scrollTo(0, 0);
-    return () => {
-      document.title = "LiberaAI · alvará e licenças em São Paulo";
-    };
   }, [copy.titleDoc]);
 
   const onSubmit = async (ev) => {
@@ -87,6 +84,11 @@ export function Falar() {
 
   return (
     <>
+      <Seo
+        title={copy.titleDoc}
+        description="Fale com a LiberaAI no WhatsApp para diagnóstico de alvará, vigilância sanitária e demais licenças em São Paulo."
+        path="/whatsapp"
+      />
       <Ambient />
       <header className="site-header">
         <nav className="site-nav">
